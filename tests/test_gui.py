@@ -32,10 +32,16 @@ class TestGui(unittest.TestCase):
                 for _ in range(20):
                     poll()
                 self.assertEqual(combos[0].configure.call_count, contagem)
+                # O F6 mantém o comportamento da versão original (pressionamento).
+                self.assertNotIn("trigger_on_release", keyboard.add_hotkey.call_args_list[0].kwargs)
                 hotkeys["F6"]()
                 clicker.alternar.assert_not_called()
                 poll()
                 clicker.alternar.assert_called_once()
+                botao = ctk.CTkButton.call_args.kwargs["command"]
+                botao()
+                poll()
+                self.assertEqual(clicker.alternar.call_count, 2)
                 hotkeys["F8"]()
                 poll()
                 clicker.desligar.assert_called_once()

@@ -43,7 +43,7 @@ Versão 1.0
 ## Seleção de botão e modo (em validação)
 
 - Escolha **Esquerdo** ou **Direito** e **Cliques repetidos** ou **Manter pressionado**.
-- **F6** liga/desliga; **F8** interrompe e libera o botão. Os atalhos disparam ao soltar a tecla, evitando repetição por mantê-la apertada.
+- **F6** liga/desliga; **F8** interrompe e libera o botão. Os atalhos disparam ao pressionar a tecla, como na versão original; use toques curtos. Há também um botão Ligar / Desligar na janela.
 - O aplicativo sempre inicia desligado. Posicione o mouse no destino antes de ativar.
 - Botão e modo ficam bloqueados enquanto estiver ligado. A velocidade só se aplica aos cliques repetidos.
 - Preferências antigas são completadas automaticamente com esquerdo/cliques repetidos; escolhas e chaves extras são preservadas.

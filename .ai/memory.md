@@ -48,3 +48,5 @@ Agora só redesenha quando ligado/erro/modo mudam. Cliques repetidos não usam a
 pausa automática adicional do PyAutoGUI dentro do lock; o intervalo configurado
 continua controlando a cadência. Teste de regressão cobre polls ociosos sem redraw.
 Validação de fluidez no Windows permanece pendente.
+
+F6 ainda não ativou no teste manual de André na versão c456370. Restaurado disparo ao pressionar (comportamento original) e adicionado botão Ligar / Desligar para uso e diagnóstico independente do atalho. Validação real permanece pendente.

@@ -208,9 +208,9 @@ def iniciar_aplicacao():
         keyboard.unhook_all_hotkeys()
         janela.destroy()
 
-    keyboard.add_hotkey(ATALHO_ALTERNAR, alternar, trigger_on_release=True)
-    keyboard.add_hotkey(ATALHO_PARAR, lambda: comandos.put("parar"),
-                        trigger_on_release=True)
+    ctk.CTkButton(janela, text="Ligar / Desligar", command=alternar).pack(pady=5)
+    keyboard.add_hotkey(ATALHO_ALTERNAR, alternar)
+    keyboard.add_hotkey(ATALHO_PARAR, lambda: comandos.put("parar"))
     atualizar_titulo()
     janela.after(50, processar_comandos)
 
