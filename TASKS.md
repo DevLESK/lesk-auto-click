@@ -148,3 +148,5 @@ Adicionado mouse_selector.py com Canvas do Tkinter, sem dependências novas.
 25 testes simulados aprovados, compilação e diff verificados.
 André confirmou versão anterior funcional no Roblox/Mu com elevação; nova
 interface aguarda inspeção visual e teste manual no Windows. Sem merge/Release.
+
+Ajuste visual solicitado: janela 280x420 (antes 320x600), mouse compacto com silhueta arredondada, seleção verde discreta e espaçamento reduzido. Título LESK AUTO CLICK. Sem alterações no motor/atalhos; validação visual no Windows pendente.

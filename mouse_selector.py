@@ -8,37 +8,41 @@ class MouseSelector:
         self.command = command
         self._valor = "Esquerdo"
         self._disabled = False
-        self.canvas = tk.Canvas(parent, width=240, height=198,
+        self.canvas = tk.Canvas(parent, width=220, height=136,
                                 bg="#242424", highlightthickness=0,
                                 takefocus=True, cursor="hand2")
-        # Corpo arredondado do mouse, com dois alvos independentes na parte superior.
+        # Silhueta compacta: topo arredondado, laterais e base contínuas.
         self.canvas.create_polygon(
-            50, 80, 50, 45, 78, 10, 120, 10, 162, 10, 190, 45,
-            190, 80, 190, 136, 170, 178, 120, 184, 70, 178, 50, 136,
-            smooth=True, fill="#303438", outline="#626970", width=2)
+            66, 43, 66, 18, 86, 5, 110, 5, 134, 5, 154, 18,
+            154, 43, 154, 87, 148, 113, 130, 125, 110, 128,
+            90, 125, 72, 113, 66, 87,
+            smooth=True, fill="#2c3035", outline="#555e68", width=2)
         self._areas = {}
         self._textos = {}
-        for nome, inicio, fim, x in (("Esquerdo", -180, -90, 84),
-                                     ("Direito", -90, 0, 156)):
+        for nome, inicio, fim, x in (("Esquerdo", -180, -90, 30),
+                                     ("Direito", -90, 0, 190)):
             arco = []
             for graus in range(inicio, fim + 1, 5):
                 angulo = math.radians(graus)
-                arco.extend((120 + 66 * math.cos(angulo),
-                             76 + 62 * math.sin(angulo)))
+                arco.extend((110 + 40 * math.cos(angulo),
+                             43 + 34 * math.sin(angulo)))
             if nome == "Esquerdo":
-                pontos = arco + [116, 96, 54, 96]
+                pontos = arco + [107, 58, 70, 58]
             else:
-                pontos = arco + [186, 96, 124, 96]
+                pontos = arco + [150, 58, 113, 58]
             tag = "botao_" + nome
             self._areas[nome] = self.canvas.create_polygon(
-                *pontos, fill="#363c42", outline="#626970", width=2, tags=tag)
+                *pontos, fill="#353a41", outline="#555e68", width=1, tags=tag)
             self._textos[nome] = self.canvas.create_text(
-                x, 63, text=nome, font=("Segoe UI", 10, "bold"), tags=tag)
+                x, 43, text=nome, font=("Segoe UI", 9), tags=tag)
             self.canvas.tag_bind(tag, "<Button-1>",
                                  lambda event, valor=nome: self._escolher(valor))
-        self.canvas.create_rectangle(116, 34, 124, 58, fill="#a7adb3", outline="")
+        # Rodinha e divisão dos botões; não são alvos de automação.
+        self.canvas.create_line(110, 13, 110, 60, fill="#242424", width=3)
+        self.canvas.create_polygon(106, 23, 114, 23, 114, 41, 106, 41,
+                                   smooth=True, fill="#909aa5", outline="")
         self._legenda = self.canvas.create_text(
-            120, 140, text="", fill="#dce1e5", font=("Segoe UI", 10))
+            110, 88, text="", fill="#9aa5b1", font=("Segoe UI", 8))
         self.canvas.bind("<Left>", lambda event: self._escolher("Esquerdo"))
         self.canvas.bind("<Right>", lambda event: self._escolher("Direito"))
         self.canvas.bind("<FocusIn>", lambda event: self.canvas.configure(
@@ -80,8 +84,9 @@ class MouseSelector:
     def _desenhar(self):
         for nome, area in self._areas.items():
             selecionado = nome == self._valor
-            self.canvas.itemconfigure(area, fill="#39FF14" if selecionado else "#363c42")
+            self.canvas.itemconfigure(area, fill="#194a38" if selecionado else "#353a41",
+                                      outline="#45d99a" if selecionado else "#555e68")
             self.canvas.itemconfigure(self._textos[nome],
-                                      fill="#102008" if selecionado else "#dce1e5")
+                                      fill="#45d99a" if selecionado else "#9aa5b1")
         self.canvas.itemconfigure(self._legenda,
-                                  text=self._valor + (" • em uso" if self._disabled else " • selecionado"))
+                                  text="EM USO" if self._disabled else "SELECIONE")

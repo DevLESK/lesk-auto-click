@@ -94,7 +94,7 @@ def iniciar_aplicacao():
     fechando = False
 
     def criar_seletor(texto, opcoes, chave):
-        ctk.CTkLabel(janela, text=texto, font=FONTE_VELOCIDADE).pack(pady=(10, 3))
+        ctk.CTkLabel(janela, text=texto, font=FONTE_VELOCIDADE).pack(pady=(6, 3))
         combo = ctk.CTkComboBox(janela, values=list(opcoes), state="readonly",
                               width=COMBO_LARGURA)
         combo.set(next(nome for nome, valor in opcoes.items() if valor == config[chave]))
@@ -103,7 +103,7 @@ def iniciar_aplicacao():
 
     combo_botao = MouseSelector(janela)
     combo_botao.set(next(nome for nome, valor in BOTOES.items() if valor == config["botao"]))
-    combo_botao.pack(pady=(6, 0))
+    combo_botao.pack(pady=(2, 0))
     combo_modo = criar_seletor("Modo", MODOS, "modo")
 
     velocidade_label = ctk.CTkLabel(
