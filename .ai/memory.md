@@ -34,3 +34,9 @@ Decisões atuais:
 - ui_constants.py centraliza textos fixos, cores, fontes, dimensões, ícone, hotkey, velocidades e intervalos.
 - caminho_recurso() permanece em gui.py.
 - main.py, clicker.py, config.py, config.json, AutoClick.spec e requirements.txt não foram alterados na Sprint 003.
+
+- Sprint 004: seleção esquerdo/direito e repetir/pressionar; F6 preservado e F8 para parada.
+- Configurações antigas recebem padrões; início sempre desligado.
+- Operações de mouse serializadas para impedir pressão após parada; liberação tentada nas saídas controladas.
+- Testes automatizados simulam mouse e GUI. Validação Windows/Mu e executável permanecem pendentes.
+- Sem QWE, atualizador, novas dependências, merge ou Release nesta etapa.

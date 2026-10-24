@@ -10,7 +10,7 @@ TEXTO_TITULO = "ROBLOX AUTO CLICK"
 TEXTO_STATUS_LIGADO = "● Ligado"
 TEXTO_STATUS_DESLIGADO = "● Desligado"
 TEXTO_VELOCIDADE = "Velocidade"
-TEXTO_ATALHO = "F6 = Ligar / Desligar"
+TEXTO_ATALHO = "F6 = Ligar / Desligar | F8 = Parar"
 
 COR_VERDE_NEON = "#39FF14"
 COR_VERDE_LABEL = "#16b955"
@@ -23,7 +23,7 @@ FONTE_STATUS = ("Segoe UI", 15, "bold")
 FONTE_VELOCIDADE = ("Segoe UI", 13, "bold")
 FONTE_ATALHO = ("Segoe UI", 12, "bold")
 
-GEOMETRIA_JANELA = "260x240"
+GEOMETRIA_JANELA = "300x430"
 JANELA_REDIMENSIONAVEL = (False, False)
 
 PADDING_TITULO = (20, 10)
@@ -42,3 +42,7 @@ INTERVALOS_POR_VELOCIDADE = {
     "Média": 0.05,
     "Rápida": 0.01,
 }
+
+ATALHO_PARAR = "F8"
+BOTOES = {"Esquerdo": "left", "Direito": "right"}
+MODOS = {"Cliques repetidos": "repetir", "Manter pressionado": "pressionar"}

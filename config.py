@@ -1,11 +1,14 @@
 import json
+import math
 from json import JSONDecodeError
 
 CONFIG = "config.json"
 
 CONFIG_PADRAO = {
     "velocidade": "Média",
-    "intervalo_clique": 0.05
+    "intervalo_clique": 0.05,
+    "botao": "left",
+    "modo": "repetir"
 }
 
 
@@ -16,6 +19,15 @@ def config_padrao():
 def completar_config(config):
     config_completa = config_padrao()
     config_completa.update(config)
+    for chave, valores in (("botao", ("left", "right")),
+                           ("modo", ("repetir", "pressionar")),
+                           ("velocidade", ("Lenta", "Média", "Rápida"))):
+        if config_completa[chave] not in valores:
+            config_completa[chave] = CONFIG_PADRAO[chave]
+    intervalo = config_completa["intervalo_clique"]
+    if (isinstance(intervalo, bool) or not isinstance(intervalo, (int, float))
+            or not math.isfinite(intervalo) or intervalo <= 0):
+        config_completa["intervalo_clique"] = CONFIG_PADRAO["intervalo_clique"]
     return config_completa
 
 

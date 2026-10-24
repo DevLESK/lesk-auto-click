@@ -65,8 +65,25 @@ class TestConfig(unittest.TestCase):
 
         resultado = config.carregar_config()
 
-        self.assertEqual(resultado, dados)
-        self.assertEqual(self.ler_config_json(), dados)
+        self.assertEqual(resultado, config.CONFIG_PADRAO | dados)
+        self.assertEqual(self.ler_config_json(), config.CONFIG_PADRAO | dados)
+
+    def test_migra_config_antiga(self):
+        self.config_path.write_text('{"velocidade": "Rápida", "intervalo_clique": 0.01}')
+        resultado = config.carregar_config()
+        self.assertEqual(resultado["botao"], "left")
+        self.assertEqual(resultado["modo"], "repetir")
+        self.assertEqual(resultado["intervalo_clique"], 0.01)
+
+    def test_corrige_novas_opcoes_invalidas(self):
+        for dados in ({"botao": "middle", "modo": "outro"},
+                      {"botao": [], "modo": {}, "intervalo_clique": -1},
+                      {"intervalo_clique": True}, {"intervalo_clique": "rápido"}):
+            self.config_path.write_text(json.dumps(dados))
+            resultado = config.carregar_config()
+            self.assertEqual(resultado["botao"], "left")
+            self.assertEqual(resultado["modo"], "repetir")
+            self.assertEqual(resultado["intervalo_clique"], 0.05)
 
     def test_preserva_chaves_extras(self):
         dados = {
@@ -78,8 +95,8 @@ class TestConfig(unittest.TestCase):
 
         resultado = config.carregar_config()
 
-        self.assertEqual(resultado, dados)
-        self.assertEqual(self.ler_config_json(), dados)
+        self.assertEqual(resultado, config.CONFIG_PADRAO | dados)
+        self.assertEqual(self.ler_config_json(), config.CONFIG_PADRAO | dados)
 
 
 if __name__ == "__main__":

@@ -120,3 +120,12 @@ Melhorar a interface gráfica.
 
 ### Status
 ☐ Não iniciado
+
+## Sprint 004 — Botão e modo selecionáveis
+
+- Implementado em branch separada: esquerdo/direito, repetir/manter pressionado, F6 e parada F8.
+- Controle serializado do mouse, encerramento e liberação em falhas controladas.
+- Migração compatível das configurações; interface mantém atualizações na thread gráfica.
+- Testes: 21 aprovados com backend de mouse e interface simulados; compilação Python e diff sem erros.
+- Pendente: teste visual/atalhos no Windows, validação no Mu e geração/teste do executável.
+- Estado: aguardando revisão; sem merge ou publicação de versão.

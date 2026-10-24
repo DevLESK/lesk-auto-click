@@ -1,5 +1,6 @@
 import os
 import sys
+import queue
 
 import customtkinter as ctk
 import keyboard
@@ -8,6 +9,9 @@ from clicker import AutoClicker
 from config import carregar_config, salvar_config
 from ui_constants import (
     ARQUIVO_ICONE,
+    ATALHO_PARAR,
+    BOTOES,
+    MODOS,
     ATALHO_ALTERNAR,
     COMBO_ALTURA,
     COMBO_LARGURA,
@@ -52,7 +56,7 @@ def caminho_recurso(nome_arquivo):
 def iniciar_aplicacao():
     config = carregar_config()
 
-    clicker = AutoClicker(config["intervalo_clique"])
+    clicker = AutoClicker(config["intervalo_clique"], config["botao"], config["modo"])
     clicker.iniciar()
 
     ctk.set_appearance_mode(MODO_APARENCIA)
@@ -85,6 +89,20 @@ def iniciar_aplicacao():
     )
     status_label.pack(pady=PADDING_STATUS)
 
+    comandos = queue.SimpleQueue()
+    fechando = False
+
+    def criar_seletor(texto, opcoes, chave):
+        ctk.CTkLabel(janela, text=texto, font=FONTE_VELOCIDADE).pack(pady=(10, 3))
+        combo = ctk.CTkComboBox(janela, values=list(opcoes), state="readonly",
+                              width=COMBO_LARGURA)
+        combo.set(next(nome for nome, valor in opcoes.items() if valor == config[chave]))
+        combo.pack()
+        return combo
+
+    combo_botao = criar_seletor("Botão", BOTOES, "botao")
+    combo_modo = criar_seletor("Modo", MODOS, "modo")
+
     velocidade_label = ctk.CTkLabel(
         janela,
         text=TEXTO_VELOCIDADE,
@@ -108,7 +126,13 @@ def iniciar_aplicacao():
     combo_velocidade.set(config.get("velocidade", VELOCIDADE_PADRAO))
 
     def atualizar_titulo():
-        if clicker.ligado:
+        ligado, erro = clicker.estado()
+        combo_botao.configure(state="disabled" if ligado else "readonly")
+        combo_modo.configure(state="disabled" if ligado else "readonly")
+        combo_velocidade.configure(
+            state="disabled" if config["modo"] == "pressionar" else "readonly"
+        )
+        if ligado:
             janela.title(TITULO_LIGADO)
             status_label.configure(
                 text=TEXTO_STATUS_LIGADO,
@@ -117,16 +141,25 @@ def iniciar_aplicacao():
         else:
             janela.title(TITULO_DESLIGADO)
             status_label.configure(
-                text=TEXTO_STATUS_DESLIGADO,
+                text="Erro: use F8 para liberar" if erro else TEXTO_STATUS_DESLIGADO,
                 text_color=COR_VERMELHO_STATUS
             )
 
     def alternar():
-        janela.after(0, alternar_tkinter)
+        comandos.put("alternar")
 
     def alternar_tkinter():
         clicker.alternar()
         atualizar_titulo()
+
+    def mudar_opcoes(_valor):
+        clicker.configurar(BOTOES[combo_botao.get()], MODOS[combo_modo.get()])
+        config["botao"], config["modo"] = clicker.botao, clicker.modo
+        salvar_config(config)
+        atualizar_titulo()
+
+    combo_botao.configure(command=mudar_opcoes)
+    combo_modo.configure(command=mudar_opcoes)
 
     def mudar_velocidade(velocidade):
         intervalo = INTERVALOS_POR_VELOCIDADE[velocidade]
@@ -147,12 +180,36 @@ def iniciar_aplicacao():
     )
     atalho_label.pack(pady=PADDING_ATALHO)
 
+    def processar_comandos():
+        if fechando:
+            return
+        while not comandos.empty():
+            comando = comandos.get()
+            if comando == "alternar":
+                alternar_tkinter()
+            else:
+                clicker.desligar()
+        atualizar_titulo()
+        janela.after(50, processar_comandos)
+
     def fechar():
-        clicker.parar()
+        nonlocal fechando
+        if not clicker.parar():
+            atualizar_titulo()
+            return
+        fechando = True
         keyboard.unhook_all_hotkeys()
         janela.destroy()
 
-    keyboard.add_hotkey(ATALHO_ALTERNAR, alternar)
+    keyboard.add_hotkey(ATALHO_ALTERNAR, alternar, trigger_on_release=True)
+    keyboard.add_hotkey(ATALHO_PARAR, lambda: comandos.put("parar"),
+                        trigger_on_release=True)
+    atualizar_titulo()
+    janela.after(50, processar_comandos)
 
     janela.protocol("WM_DELETE_WINDOW", fechar)
-    janela.mainloop()
+    try:
+        janela.mainloop()
+    finally:
+        clicker.parar()
+        keyboard.unhook_all_hotkeys()
