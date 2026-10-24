@@ -37,7 +37,7 @@ class TestClicker(unittest.TestCase):
             self.clicker.configurar(botao, "repetir")
             self.clicker.ligar()
             self.clicker._passo()
-            mouse.click.assert_called_with(button=botao)
+            mouse.click.assert_called_with(button=botao, _pause=False)
             self.clicker.desligar()
         mouse.mouseDown.assert_not_called()
 

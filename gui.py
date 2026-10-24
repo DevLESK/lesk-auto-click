@@ -125,8 +125,15 @@ def iniciar_aplicacao():
 
     combo_velocidade.set(config.get("velocidade", VELOCIDADE_PADRAO))
 
+    ultimo_estado = None
+
     def atualizar_titulo():
+        nonlocal ultimo_estado
         ligado, erro = clicker.estado()
+        estado_visual = (ligado, erro, config["modo"])
+        if estado_visual == ultimo_estado:
+            return
+        ultimo_estado = estado_visual
         combo_botao.configure(state="disabled" if ligado else "readonly")
         combo_modo.configure(state="disabled" if ligado else "readonly")
         combo_velocidade.configure(

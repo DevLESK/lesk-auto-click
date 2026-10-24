@@ -129,3 +129,11 @@ Melhorar a interface gráfica.
 - Testes: 21 aprovados com backend de mouse e interface simulados; compilação Python e diff sem erros.
 - Pendente: teste visual/atalhos no Windows, validação no Mu e geração/teste do executável.
 - Estado: aguardando revisão; sem merge ou publicação de versão.
+
+
+Correção após teste manual: André relatou janela engasgando ao arrastar e F6 demorado.
+A interface reconfigurava widgets 20 vezes por segundo mesmo sem mudança de estado.
+Agora só redesenha quando ligado/erro/modo mudam. Cliques repetidos não usam a
+pausa automática adicional do PyAutoGUI dentro do lock; o intervalo configurado
+continua controlando a cadência. Teste de regressão cobre polls ociosos sem redraw.
+Validação de fluidez no Windows permanece pendente.

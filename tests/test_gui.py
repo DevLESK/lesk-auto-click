@@ -27,6 +27,11 @@ class TestGui(unittest.TestCase):
             def executar_interface():
                 hotkeys = {c.args[0]: c.args[1] for c in keyboard.add_hotkey.call_args_list}
                 poll = janela.after.call_args.args[1]
+                # Polls ociosos não devem redesenhar os widgets a cada 50 ms.
+                contagem = combos[0].configure.call_count
+                for _ in range(20):
+                    poll()
+                self.assertEqual(combos[0].configure.call_count, contagem)
                 hotkeys["F6"]()
                 clicker.alternar.assert_not_called()
                 poll()

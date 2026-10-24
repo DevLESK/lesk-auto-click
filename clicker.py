@@ -50,7 +50,7 @@ class AutoClicker:
                         self._pressionado = self.botao
                         pyautogui.mouseDown(button=self.botao, _pause=False)
                     return 0.05
-                pyautogui.click(button=self.botao)
+                pyautogui.click(button=self.botao, _pause=False)
                 return self.intervalo_clique
             except Exception as exc:
                 self.erro = str(exc) or type(exc).__name__

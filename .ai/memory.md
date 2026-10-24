@@ -40,3 +40,11 @@ Decisões atuais:
 - Operações de mouse serializadas para impedir pressão após parada; liberação tentada nas saídas controladas.
 - Testes automatizados simulam mouse e GUI. Validação Windows/Mu e executável permanecem pendentes.
 - Sem QWE, atualizador, novas dependências, merge ou Release nesta etapa.
+
+
+Correção após teste manual: André relatou janela engasgando ao arrastar e F6 demorado.
+A interface reconfigurava widgets 20 vezes por segundo mesmo sem mudança de estado.
+Agora só redesenha quando ligado/erro/modo mudam. Cliques repetidos não usam a
+pausa automática adicional do PyAutoGUI dentro do lock; o intervalo configurado
+continua controlando a cadência. Teste de regressão cobre polls ociosos sem redraw.
+Validação de fluidez no Windows permanece pendente.
