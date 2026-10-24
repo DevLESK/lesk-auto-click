@@ -12,7 +12,9 @@ class TestGui(unittest.TestCase):
         clicker.parar.return_value = True
         clicker.botao, clicker.modo = "right", "pressionar"
         combos = [Mock(), Mock(), Mock()]
-        ctk.CTkComboBox.side_effect = combos
+        seletor_module = Mock()
+        seletor_module.MouseSelector.return_value = combos[0]
+        ctk.CTkComboBox.side_effect = combos[1:]
         janela = ctk.CTk.return_value
         config = {"intervalo_clique": 0.05, "velocidade": "Média",
                   "botao": "left", "modo": "repetir"}
@@ -22,7 +24,8 @@ class TestGui(unittest.TestCase):
         spec = importlib.util.spec_from_file_location("gui_em_teste", Path(__file__).resolve().parents[1] / "gui.py")
         gui = importlib.util.module_from_spec(spec)
         with patch.dict(sys.modules, {"customtkinter": ctk, "keyboard": keyboard,
-                                     "clicker": clicker_module, "config": config_module}):
+                                     "clicker": clicker_module, "config": config_module,
+                                     "mouse_selector": seletor_module}):
             spec.loader.exec_module(gui)
             def executar_interface():
                 hotkeys = {c.args[0]: c.args[1] for c in keyboard.add_hotkey.call_args_list}

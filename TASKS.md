@@ -139,3 +139,12 @@ continua controlando a cadência. Teste de regressão cobre polls ociosos sem re
 Validação de fluidez no Windows permanece pendente.
 
 F6 ainda não ativou no teste manual de André na versão c456370. Restaurado disparo ao pressionar (comportamento original) e adicionado botão Ligar / Desligar para uso e diagnóstico independente do atalho. Validação real permanece pendente.
+
+
+Seletor visual aprovado por André: desenho de mouse clicável, seleção exclusiva
+esquerda/direita em verde, bloqueada durante execução. F6 alterna o escolhido;
+F8 somente para. Sem automação simultânea ou ativação por clique físico no jogo.
+Adicionado mouse_selector.py com Canvas do Tkinter, sem dependências novas.
+25 testes simulados aprovados, compilação e diff verificados.
+André confirmou versão anterior funcional no Roblox/Mu com elevação; nova
+interface aguarda inspeção visual e teste manual no Windows. Sem merge/Release.

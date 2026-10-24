@@ -42,7 +42,9 @@ Versão 1.0
 
 ## Seleção de botão e modo (em validação)
 
-- Escolha **Esquerdo** ou **Direito** e **Cliques repetidos** ou **Manter pressionado**.
+- Clique na metade **Esquerdo** ou **Direito** do desenho do mouse; a seleção fica verde. Depois escolha **Cliques repetidos** ou **Manter pressionado**.
+- Selecionar o desenho não liga a automação. Apenas um botão é automatizado por vez; F6 liga/desliga e F8 para.
+- O seletor aceita foco por Tab e seleção pelas setas esquerda/direita.
 - **F6** liga/desliga; **F8** interrompe e libera o botão. Os atalhos disparam ao pressionar a tecla, como na versão original; use toques curtos. Há também um botão Ligar / Desligar na janela.
 - O aplicativo sempre inicia desligado. Posicione o mouse no destino antes de ativar.
 - Botão e modo ficam bloqueados enquanto estiver ligado. A velocidade só se aplica aos cliques repetidos.
@@ -55,7 +57,7 @@ Versão 1.0
 
 ```powershell
 python -m unittest discover -s tests -v
-python -m compileall -q main.py gui.py clicker.py config.py ui_constants.py
+python -m compileall -q main.py gui.py mouse_selector.py clicker.py config.py ui_constants.py
 ```
 
 Os testes de mouse e interface usam simulações, sem emitir entradas reais.
@@ -79,3 +81,7 @@ python -m PyInstaller --clean --noconfirm AutoClick.spec
 ```
 
 O resultado esperado é `dist/AutoClick.exe`. Teste também o executável e suas preferências antes de compartilhar. Não há atualização automática, QWE nem Release nesta etapa.
+
+### Compatibilidade observada
+
+André confirmou funcionamento no Roblox e no Mu após executar o aplicativo com elevação. Se o jogo roda como administrador e os atalhos não respondem nele, teste o aplicativo com o mesmo nível de permissão. Isso não exige desativar proteções do jogo. O teste anterior foi funcional; o novo seletor visual ainda precisa de validação no Windows.

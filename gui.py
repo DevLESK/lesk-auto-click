@@ -6,6 +6,7 @@ import customtkinter as ctk
 import keyboard
 
 from clicker import AutoClicker
+from mouse_selector import MouseSelector
 from config import carregar_config, salvar_config
 from ui_constants import (
     ARQUIVO_ICONE,
@@ -100,7 +101,9 @@ def iniciar_aplicacao():
         combo.pack()
         return combo
 
-    combo_botao = criar_seletor("Botão", BOTOES, "botao")
+    combo_botao = MouseSelector(janela)
+    combo_botao.set(next(nome for nome, valor in BOTOES.items() if valor == config["botao"]))
+    combo_botao.pack(pady=(6, 0))
     combo_modo = criar_seletor("Modo", MODOS, "modo")
 
     velocidade_label = ctk.CTkLabel(
@@ -130,7 +133,7 @@ def iniciar_aplicacao():
     def atualizar_titulo():
         nonlocal ultimo_estado
         ligado, erro = clicker.estado()
-        estado_visual = (ligado, erro, config["modo"])
+        estado_visual = (ligado, erro, config["modo"], config["botao"])
         if estado_visual == ultimo_estado:
             return
         ultimo_estado = estado_visual
