@@ -154,3 +154,5 @@ Ajuste visual solicitado: janela 280x420 (antes 320x600), mouse compacto com sil
 André informou clique repetido funcional fora do Mu e sem registro dentro dele, mesmo com VS Code elevado. Hipótese de duração insuficiente: substituído clique instantâneo por mouseDown, pressão de 50 ms e mouseUp; modo pressionado preservado. Não há confirmação de correção no Mu. Testes simulados de sequência/liberação e falhas adicionados.
 
 Acabamento após screenshot de André: mouse rasterizado em 4x com Pillow já existente e redução LANCZOS; legenda fora do corpo; seletores unificados; organização em grid com botão de 32 px e margens. Janela 280x420 preservada. Mouse visualmente inspecionado; janela completa no Windows pendente. 29 testes passaram. Motor e atalhos não alterados.
+
+Pedido de André: removidos nomes laterais e legenda textual do mouse; seleção indicada visualmente pelo verde. Janela reduzida para 280x400 aproveitando a remoção da legenda.

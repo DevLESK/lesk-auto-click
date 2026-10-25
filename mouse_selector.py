@@ -9,7 +9,7 @@ class MouseSelector:
         self.command = command
         self._valor = "Esquerdo"
         self._disabled = False
-        self.canvas = tk.Canvas(parent, width=220, height=130,
+        self.canvas = tk.Canvas(parent, width=220, height=110,
                                 bg="#242424", highlightthickness=1,
                                 highlightbackground="#242424",
                                 takefocus=True, cursor="hand2")
@@ -21,12 +21,8 @@ class MouseSelector:
             tag = "botao_" + nome
             # Áreas transparentes mantêm a seleção clicável sobre a imagem.
             self.canvas.create_rectangle(*box, fill="", outline="", tags=tag)
-            self._textos[nome] = self.canvas.create_text(
-                x, 35, text=nome, font=("Segoe UI", 9), tags=tag)
             self.canvas.tag_bind(tag, "<Button-1>",
                                  lambda event, valor=nome: self._escolher(valor))
-        self._legenda = self.canvas.create_text(
-            110, 120, text="", fill="#aab5bf", font=("Segoe UI", 9))
         # O Canvas não detecta o interior de retângulos sem preenchimento:
         # testar as coordenadas também garante toda a metade superior clicável.
         self.canvas.bind("<Button-1>", self._clicar_imagem)
@@ -103,6 +99,3 @@ class MouseSelector:
         for nome, texto in self._textos.items():
             self.canvas.itemconfigure(texto,
                                       fill="#45d99a" if nome == self._valor else "#aab5bf")
-        self.canvas.itemconfigure(self._legenda,
-                                  text=f"Botão {self._valor.lower()}" +
-                                  (" • em uso" if self._disabled else " selecionado"))
