@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 import threading
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, call
 
 # Carregar com backend simulado: nunca importar/acionar o mouse real.
 mouse = Mock()
@@ -37,9 +37,10 @@ class TestClicker(unittest.TestCase):
             self.clicker.configurar(botao, "repetir")
             self.clicker.ligar()
             self.clicker._passo()
-            mouse.click.assert_called_with(button=botao, _pause=False)
+            mouse.mouseDown.assert_called_with(button=botao, _pause=False)
+            mouse.mouseUp.assert_called_with(button=botao, _pause=False)
             self.clicker.desligar()
-        mouse.mouseDown.assert_not_called()
+        mouse.click.assert_not_called()
 
     def test_dois_botoes_pressionados_uma_vez(self):
         for botao in ("left", "right"):
@@ -140,3 +141,21 @@ class TestClicker(unittest.TestCase):
         self.assertIs(thread, self.clicker._thread)
         self.clicker.parar()
         self.assertFalse(thread.is_alive())
+
+    def test_clique_repetido_tem_pressao_curta_e_libera(self):
+        self.clicker.ligar()
+        with patch.object(self.clicker._encerrar, "wait") as espera:
+            intervalo = self.clicker._passo()
+        espera.assert_called_once_with(0.05)
+        self.assertEqual(intervalo, 0.05)
+        self.assertEqual(mouse.mock_calls, [
+            call.mouseDown(button="left", _pause=False),
+            call.mouseUp(button="left", _pause=False)])
+        self.assertIsNone(self.clicker._pressionado)
+
+    def test_falha_no_clique_repetido_tenta_soltar(self):
+        mouse.mouseDown.side_effect = RuntimeError("falha no clique")
+        self.clicker.ligar()
+        self.clicker._passo()
+        self.assertFalse(self.clicker.ligado)
+        mouse.mouseUp.assert_called_once_with(button="left", _pause=False)

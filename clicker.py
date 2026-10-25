@@ -50,7 +50,12 @@ class AutoClicker:
                         self._pressionado = self.botao
                         pyautogui.mouseDown(button=self.botao, _pause=False)
                     return 0.05
-                pyautogui.click(button=self.botao, _pause=False)
+                # Alguns aplicativos consultam o estado do botão por quadro:
+                # down/up instantâneos podem passar sem serem observados.
+                self._pressionado = self.botao
+                pyautogui.mouseDown(button=self.botao, _pause=False)
+                self._encerrar.wait(0.05)
+                self._soltar()
                 return self.intervalo_clique
             except Exception as exc:
                 self.erro = str(exc) or type(exc).__name__

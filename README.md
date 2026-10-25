@@ -85,3 +85,5 @@ O resultado esperado é `dist/AutoClick.exe`. Teste também o executável e suas
 ### Compatibilidade observada
 
 André confirmou funcionamento no Roblox e no Mu após executar o aplicativo com elevação. Se o jogo roda como administrador e os atalhos não respondem nele, teste o aplicativo com o mesmo nível de permissão. Isso não exige desativar proteções do jogo. O teste anterior foi funcional; o novo seletor visual ainda precisa de validação no Windows.
+
+Cliques repetidos agora mantêm o botão pressionado por 50 ms antes de soltar, além do intervalo selecionado entre cliques. É um ajuste de compatibilidade para aplicativos que não observam pressão/soltura instantâneas. Funcionamento dessa alteração no Mu ainda precisa de teste manual.
