@@ -99,6 +99,7 @@ def iniciar_aplicacao():
 
     estilo_seletor = dict(
         width=COMBO_LARGURA, height=COMBO_ALTURA, corner_radius=COMBO_RAIO_BORDA,
+        justify="center",
         fg_color="#30363e", border_color="#48525d", border_width=1,
         button_color="#30363e", button_hover_color="#414d58",
         dropdown_fg_color="#30363e", dropdown_hover_color="#20523f",
@@ -202,8 +203,8 @@ def iniciar_aplicacao():
                    padx=(0, 4) if coluna == 0 else (4, 0))
         ctk.CTkLabel(bloco, text=tecla, height=20, text_color=cor,
                      font=("Segoe UI", 15, "bold")).pack(pady=(3, 0))
-        ctk.CTkLabel(bloco, text=descricao, height=16,
-                     text_color="#e4e9ee", font=("Segoe UI", 10)).pack(pady=(0, 4))
+        ctk.CTkLabel(bloco, text=descricao, height=18,
+                     text_color="#e4e9ee", font=("Segoe UI", 11)).pack(pady=(0, 6))
 
     def processar_comandos():
         if fechando:

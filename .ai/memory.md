@@ -77,3 +77,5 @@ Refinamentos autorizados: removido botão Ligar/Desligar; F6 alterna e F8 para. 
 Interrupção manual autorizada: somente no modo pressionar, pressionar fisicamente o MESMO botão interrompe a automação; status acompanha o estado desligado. Outro botão e modo repetir não mudam. Observador Windows WH_MOUSE_LL filtra LLMHF_INJECTED para ignorar entradas sintéticas e encaminha eventos por fila à GUI. Sem novas dependências; 33 testes simulados passaram. Integração nativa Windows/Mu pendente; não declarar validação real antes de André testar.
 
 Reorganização aprovada: mouse ampliado aproveitando margens transparentes, Modo/Velocidade centralizados com títulos acima dos campos, F6 e F8 em blocos destacados verde/vermelho. Mantida janela 280x400; nenhuma alteração de lógica. Conferência visual no Windows pendente.
+
+Correção baseada no print Windows: texto dos seletores centralizado; janela 280x430 para exibir integralmente os blocos F6/F8 sem reduzir o mouse. Descrições do rodapé com fonte 11 e maior margem inferior. Sem alteração funcional.
