@@ -6,6 +6,9 @@ from mouse_selector import MouseSelector
 
 class TestMouseSelector(unittest.TestCase):
     def setUp(self):
+        self.foto = patch("mouse_selector.ImageTk.PhotoImage", return_value=Mock())
+        self.foto.start()
+        self.addCleanup(self.foto.stop)
         self.backend = patch("mouse_selector.tk.Canvas")
         self.canvas = self.backend.start().return_value
         self.addCleanup(self.backend.stop)
@@ -44,3 +47,16 @@ class TestMouseSelector(unittest.TestCase):
         self.assertEqual(self.selector.get(), "Esquerdo")
         teclas["<Right>"](Mock())
         self.assertEqual(self.selector.get(), "Direito")
+
+    def test_clique_dentro_da_imagem(self):
+        self.selector._clicar_imagem(Mock(x=135, y=30))
+        self.assertEqual(self.selector.get(), "Direito")
+        self.selector._clicar_imagem(Mock(x=80, y=80))
+        self.assertEqual(self.selector.get(), "Direito")
+
+    def test_imagem_tem_selecao_e_contorno_suave(self):
+        esquerda = MouseSelector.renderizar_mouse("Esquerdo")
+        direita = MouseSelector.renderizar_mouse("Direito")
+        self.assertEqual(esquerda.size, (220, 108))
+        self.assertNotEqual(esquerda.getpixel((85, 35)), direita.getpixel((85, 35)))
+        self.assertEqual(esquerda.getpixel((0, 0)), (36, 36, 36))

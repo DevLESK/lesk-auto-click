@@ -63,3 +63,5 @@ interface aguarda inspeção visual e teste manual no Windows. Sem merge/Release
 Ajuste visual solicitado: janela 280x420 (antes 320x600), mouse compacto com silhueta arredondada, seleção verde discreta e espaçamento reduzido. Título LESK AUTO CLICK. Sem alterações no motor/atalhos; validação visual no Windows pendente.
 
 André informou clique repetido funcional fora do Mu e sem registro dentro dele, mesmo com VS Code elevado. Hipótese de duração insuficiente: substituído clique instantâneo por mouseDown, pressão de 50 ms e mouseUp; modo pressionado preservado. Não há confirmação de correção no Mu. Testes simulados de sequência/liberação e falhas adicionados.
+
+Acabamento após screenshot de André: mouse rasterizado em 4x com Pillow já existente e redução LANCZOS; legenda fora do corpo; seletores unificados; organização em grid com botão de 32 px e margens. Janela 280x420 preservada. Mouse visualmente inspecionado; janela completa no Windows pendente. 29 testes passaram. Motor e atalhos não alterados.

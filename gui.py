@@ -30,10 +30,6 @@ from ui_constants import (
     INTERVALOS_POR_VELOCIDADE,
     JANELA_REDIMENSIONAVEL,
     MODO_APARENCIA,
-    PADDING_ATALHO,
-    PADDING_STATUS,
-    PADDING_TITULO,
-    PADDING_VELOCIDADE,
     TEMA_COR,
     TEXTO_ATALHO,
     TEXTO_STATUS_DESLIGADO,
@@ -74,57 +70,66 @@ def iniciar_aplicacao():
     janela.geometry(GEOMETRIA_JANELA)
     janela.resizable(*JANELA_REDIMENSIONAVEL)
 
+    conteudo = ctk.CTkFrame(janela, fg_color="transparent")
+    conteudo.pack(fill="both", expand=True, padx=20, pady=12)
+    conteudo.grid_columnconfigure(0, weight=1)
+
     titulo = ctk.CTkLabel(
-        janela,
+        conteudo,
+        height=24,
         text=TEXTO_TITULO,
         font=FONTE_TITULO,
         text_color=COR_VERDE_NEON
     )
-    titulo.pack(pady=PADDING_TITULO)
+    titulo.grid(row=0, column=0, pady=(0, 2))
 
     status_label = ctk.CTkLabel(
-        janela,
+        conteudo,
+        height=20,
         text=TEXTO_STATUS_DESLIGADO,
         font=FONTE_STATUS,
         text_color=COR_VERMELHO_STATUS
     )
-    status_label.pack(pady=PADDING_STATUS)
+    status_label.grid(row=1, column=0)
 
     comandos = queue.SimpleQueue()
     fechando = False
 
+    estilo_seletor = dict(
+        width=COMBO_LARGURA, height=COMBO_ALTURA, corner_radius=COMBO_RAIO_BORDA,
+        fg_color="#30363e", border_color="#48525d", border_width=1,
+        button_color="#30363e", button_hover_color="#414d58",
+        dropdown_fg_color="#30363e", dropdown_hover_color="#20523f",
+        text_color="#e4e9ee", text_color_disabled="#84919d",
+        font=("Segoe UI", 12), dropdown_font=("Segoe UI", 12))
+
     def criar_seletor(texto, opcoes, chave):
-        ctk.CTkLabel(janela, text=texto, font=FONTE_VELOCIDADE).pack(pady=(6, 3))
-        combo = ctk.CTkComboBox(janela, values=list(opcoes), state="readonly",
-                              width=COMBO_LARGURA)
+        ctk.CTkLabel(conteudo, text=texto, height=20,
+                     font=FONTE_VELOCIDADE, text_color=COR_VERDE_LABEL).grid(
+                         row=3, column=0, sticky="w", pady=(6, 2))
+        combo = ctk.CTkComboBox(conteudo, values=list(opcoes), state="readonly",
+                              **estilo_seletor)
         combo.set(next(nome for nome, valor in opcoes.items() if valor == config[chave]))
-        combo.pack()
+        combo.grid(row=4, column=0, sticky="ew")
         return combo
 
-    combo_botao = MouseSelector(janela)
+    combo_botao = MouseSelector(conteudo)
     combo_botao.set(next(nome for nome, valor in BOTOES.items() if valor == config["botao"]))
-    combo_botao.pack(pady=(2, 0))
+    combo_botao.canvas.grid(row=2, column=0, pady=(2, 0))
     combo_modo = criar_seletor("Modo", MODOS, "modo")
 
     velocidade_label = ctk.CTkLabel(
-        janela,
+        conteudo,
+        height=20,
         text=TEXTO_VELOCIDADE,
         font=FONTE_VELOCIDADE,
         text_color=COR_VERDE_LABEL
     )
-    velocidade_label.pack(pady=PADDING_VELOCIDADE)
+    velocidade_label.grid(row=5, column=0, sticky="w", pady=(8, 2))
 
     combo_velocidade = ctk.CTkComboBox(
-        janela,
-        values=VELOCIDADES,
-        width=COMBO_LARGURA,
-        height=COMBO_ALTURA,
-        corner_radius=COMBO_RAIO_BORDA,
-        button_color=COR_VERDE_NEON,
-        button_hover_color=COR_VERDE_HOVER,
-        dropdown_hover_color=COR_VERDE_HOVER
-    )
-    combo_velocidade.pack()
+        conteudo, values=VELOCIDADES, state="readonly", **estilo_seletor)
+    combo_velocidade.grid(row=6, column=0, sticky="ew")
 
     combo_velocidade.set(config.get("velocidade", VELOCIDADE_PADRAO))
 
@@ -183,12 +188,13 @@ def iniciar_aplicacao():
     combo_velocidade.configure(command=mudar_velocidade)
 
     atalho_label = ctk.CTkLabel(
-        janela,
+        conteudo,
+        height=20,
         text=TEXTO_ATALHO,
         font=FONTE_ATALHO,
         text_color=COR_CINZA
     )
-    atalho_label.pack(pady=PADDING_ATALHO)
+    atalho_label.grid(row=8, column=0, pady=(8, 0))
 
     def processar_comandos():
         if fechando:
@@ -211,7 +217,11 @@ def iniciar_aplicacao():
         keyboard.unhook_all_hotkeys()
         janela.destroy()
 
-    ctk.CTkButton(janela, text="Ligar / Desligar", command=alternar).pack(pady=5)
+    ctk.CTkButton(conteudo, text="Ligar / Desligar", command=alternar,
+                  height=32, corner_radius=8, fg_color="#32c78b",
+                  hover_color="#28ae79", text_color="#10251b",
+                  font=("Segoe UI", 12, "bold")).grid(
+                      row=7, column=0, sticky="ew", pady=(14, 0))
     keyboard.add_hotkey(ATALHO_ALTERNAR, alternar)
     keyboard.add_hotkey(ATALHO_PARAR, lambda: comandos.put("parar"))
     atualizar_titulo()
