@@ -67,3 +67,5 @@ André informou clique repetido funcional fora do Mu e sem registro dentro dele,
 Acabamento após screenshot de André: mouse rasterizado em 4x com Pillow já existente e redução LANCZOS; legenda fora do corpo; seletores unificados; organização em grid com botão de 32 px e margens. Janela 280x420 preservada. Mouse visualmente inspecionado; janela completa no Windows pendente. 29 testes passaram. Motor e atalhos não alterados.
 
 Pedido de André: removidos nomes laterais e legenda textual do mouse; seleção indicada visualmente pelo verde. Janela reduzida para 280x400 aproveitando a remoção da legenda.
+
+Refinamento solicitado: mouse com silhueta ergonômica em curvas Bézier, botões separados, rodinha detalhada, contornos suaves e verde exclusivo na seleção. Sem alterações funcionais ou de tamanho da janela.

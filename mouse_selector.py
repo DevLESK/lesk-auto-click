@@ -1,7 +1,7 @@
 """Seletor visual de um único botão; não emite entradas de mouse."""
 import tkinter as tk
 
-from PIL import Image, ImageChops, ImageDraw, ImageTk
+from PIL import Image, ImageDraw, ImageTk
 
 
 class MouseSelector:
@@ -74,23 +74,50 @@ class MouseSelector:
         escala = 4
         imagem = Image.new("RGB", (220 * escala, 108 * escala), "#242424")
         desenho = ImageDraw.Draw(imagem)
-        corpo = (70 * escala, 4 * escala, 150 * escala, 104 * escala)
-        mascara = Image.new("L", imagem.size)
-        ImageDraw.Draw(mascara).rounded_rectangle(corpo, radius=38 * escala, fill=255)
-        imagem.paste("#30363e", mask=mascara)
-        metade = Image.new("L", imagem.size)
-        x1, x2 = (70, 109) if valor == "Esquerdo" else (111, 150)
-        ImageDraw.Draw(metade).rectangle((x1 * escala, 4 * escala,
-                                         x2 * escala, 51 * escala), fill=255)
-        imagem.paste("#20523f", mask=ImageChops.multiply(mascara, metade))
-        desenho.rounded_rectangle(corpo, radius=38 * escala,
-                                  outline="#687480", width=escala)
-        desenho.line((70 * escala, 52 * escala, 150 * escala, 52 * escala),
-                      fill="#687480", width=escala)
-        desenho.line((110 * escala, 5 * escala, 110 * escala, 52 * escala),
-                      fill="#242424", width=2 * escala)
-        desenho.rounded_rectangle((106 * escala, 19 * escala, 114 * escala, 36 * escala),
-                                  radius=4 * escala, fill="#a7b3be")
+
+        def curva(inicio, trechos):
+            pontos = [inicio]
+            atual = inicio
+            for c1, c2, fim in trechos:
+                for passo in range(1, 33):
+                    t = passo / 32
+                    u = 1 - t
+                    pontos.append((u**3 * atual[0] + 3*u*u*t*c1[0] +
+                                   3*u*t*t*c2[0] + t**3*fim[0],
+                                   u**3 * atual[1] + 3*u*u*t*c1[1] +
+                                   3*u*t*t*c2[1] + t**3*fim[1]))
+                atual = fim
+            return [(round(x * escala), round(y * escala)) for x, y in pontos]
+
+        corpo = curva((110, 4), [
+            ((84, 4), (76, 15), (76, 37)),
+            ((76, 57), (68, 72), (73, 87)),
+            ((77, 102), (93, 105), (110, 105)),
+            ((127, 105), (143, 102), (147, 87)),
+            ((152, 72), (144, 57), (144, 37)),
+            ((144, 15), (136, 4), (110, 4))])
+        sombra = [(x, y + 2 * escala) for x, y in corpo]
+        desenho.polygon(sombra, fill="#171b1e")
+        desenho.polygon(corpo, fill="#2c3239")
+        desenho.line(corpo + [corpo[0]], fill="#65717d", width=escala)
+        esquerda = curva((107, 9), [
+            ((87, 9), (81, 18), (81, 36)),
+            ((81, 42), (80, 47), (79, 51)),
+            ((86, 54), (98, 54), (107, 52)),
+            ((107, 40), (107, 21), (107, 9))])
+        direita = [(220 * escala - x, y) for x, y in esquerda]
+        for nome, pontos in (("Esquerdo", esquerda), ("Direito", direita)):
+            escolhido = nome == valor
+            desenho.polygon(pontos, fill="#1d5c44" if escolhido else "#39434e")
+            desenho.line(pontos + [pontos[0]],
+                          fill="#45d99a" if escolhido else "#6c7b89", width=escala)
+        desenho.rounded_rectangle((106*escala, 18*escala, 114*escala, 37*escala),
+                                  radius=4*escala, fill="#141a20", outline="#6c7884", width=escala)
+        desenho.rounded_rectangle((108*escala, 21*escala, 112*escala, 33*escala),
+                                  radius=2*escala, fill="#a1acb7")
+        # Detalhes discretos de pegada e encaixe, sem texto dentro do mouse.
+        desenho.arc((78*escala, 61*escala, 142*escala, 98*escala),
+                     start=12, end=168, fill="#414d58", width=escala)
         return imagem.resize((220, 108), Image.Resampling.LANCZOS)
 
     def _desenhar(self):
