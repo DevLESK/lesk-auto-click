@@ -57,7 +57,7 @@ class TestMouseSelector(unittest.TestCase):
     def test_imagem_tem_selecao_e_contorno_suave(self):
         esquerda = MouseSelector.renderizar_mouse("Esquerdo")
         direita = MouseSelector.renderizar_mouse("Direito")
-        self.assertEqual(esquerda.size, (220, 172))
+        self.assertEqual(esquerda.size, (220, 180))
         self.assertNotEqual(esquerda.getpixel((90, 40)), direita.getpixel((90, 40)))
         self.assertEqual(esquerda.getpixel((0, 0)), (36, 36, 36))
 
@@ -67,5 +67,5 @@ class TestMouseSelector(unittest.TestCase):
         MouseSelector.renderizar_mouse.cache_clear()
         with patch.object(mouse_selector.sys, "_MEIPASS", str(Path(mouse_selector.__file__).parent), create=True):
             imagem = MouseSelector.renderizar_mouse("Direito")
-        self.assertEqual(imagem.size, (220, 172))
+        self.assertEqual(imagem.size, (220, 180))
         MouseSelector.renderizar_mouse.cache_clear()

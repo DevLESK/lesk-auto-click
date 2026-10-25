@@ -72,18 +72,17 @@ def iniciar_aplicacao():
     janela.resizable(*JANELA_REDIMENSIONAVEL)
 
     conteudo = ctk.CTkFrame(janela, fg_color="transparent")
-    conteudo.pack(fill="both", expand=True, padx=20, pady=12)
-    conteudo.grid_columnconfigure(0, weight=0, minsize=72)
-    conteudo.grid_columnconfigure(1, weight=1)
+    conteudo.pack(fill="both", expand=True, padx=16, pady=8)
+    conteudo.grid_columnconfigure(0, weight=1)
 
     titulo = ctk.CTkLabel(
         conteudo,
-        height=24,
+        height=22,
         text=TEXTO_TITULO,
         font=FONTE_TITULO,
         text_color=COR_VERDE_NEON
     )
-    titulo.grid(row=0, column=0, columnspan=2, pady=(0, 2))
+    titulo.grid(row=0, column=0, pady=(0, 2))
 
     status_label = ctk.CTkLabel(
         conteudo,
@@ -92,7 +91,7 @@ def iniciar_aplicacao():
         font=FONTE_STATUS,
         text_color=COR_VERMELHO_STATUS
     )
-    status_label.grid(row=1, column=0, columnspan=2)
+    status_label.grid(row=1, column=0)
 
     comandos = queue.SimpleQueue()
     fechando = False
@@ -107,32 +106,32 @@ def iniciar_aplicacao():
         font=("Segoe UI", 12), dropdown_font=("Segoe UI", 12))
 
     def criar_seletor(texto, opcoes, chave):
-        ctk.CTkLabel(conteudo, text=texto, height=20,
+        ctk.CTkLabel(conteudo, text=texto, height=18,
                      font=FONTE_VELOCIDADE, text_color=COR_VERDE_LABEL).grid(
-                         row=3, column=0, sticky="w", pady=(8, 0))
+                         row=3, column=0, pady=(0, 2))
         combo = ctk.CTkComboBox(conteudo, values=list(opcoes), state="readonly",
                               **estilo_seletor)
         combo.set(next(nome for nome, valor in opcoes.items() if valor == config[chave]))
-        combo.grid(row=3, column=1, sticky="ew", pady=(8, 0))
+        combo.grid(row=4, column=0)
         return combo
 
     combo_botao = MouseSelector(conteudo)
     combo_botao.set(next(nome for nome, valor in BOTOES.items() if valor == config["botao"]))
-    combo_botao.canvas.grid(row=2, column=0, columnspan=2, pady=(2, 0))
+    combo_botao.canvas.grid(row=2, column=0, pady=(2, 0))
     combo_modo = criar_seletor("Modo", MODOS, "modo")
 
     velocidade_label = ctk.CTkLabel(
         conteudo,
-        height=20,
+        height=18,
         text=TEXTO_VELOCIDADE,
         font=FONTE_VELOCIDADE,
         text_color=COR_VERDE_LABEL
     )
-    velocidade_label.grid(row=4, column=0, sticky="w", pady=(8, 0))
+    velocidade_label.grid(row=5, column=0, pady=(6, 2))
 
     combo_velocidade = ctk.CTkComboBox(
         conteudo, values=VELOCIDADES, state="readonly", **estilo_seletor)
-    combo_velocidade.grid(row=4, column=1, sticky="ew", pady=(8, 0))
+    combo_velocidade.grid(row=6, column=0)
 
     combo_velocidade.set(config.get("velocidade", VELOCIDADE_PADRAO))
 
@@ -190,14 +189,21 @@ def iniciar_aplicacao():
 
     combo_velocidade.configure(command=mudar_velocidade)
 
-    atalho_label = ctk.CTkLabel(
-        conteudo,
-        height=20,
-        text=TEXTO_ATALHO,
-        font=FONTE_ATALHO,
-        text_color=COR_CINZA
-    )
-    atalho_label.grid(row=5, column=0, columnspan=2, pady=(18, 0))
+    atalhos = ctk.CTkFrame(conteudo, fg_color="transparent")
+    atalhos.grid(row=7, column=0, sticky="ew", pady=(10, 0))
+    atalhos.grid_columnconfigure((0, 1), weight=1, uniform="atalhos")
+    for coluna, tecla, descricao, cor, fundo in (
+        (0, "F6", "Liga / desliga", "#45d99a", "#203c32"),
+        (1, "F8", "Parar", "#ff8282", "#3d292d"),
+    ):
+        bloco = ctk.CTkFrame(atalhos, fg_color=fundo, border_color=cor,
+                             border_width=1, corner_radius=8)
+        bloco.grid(row=0, column=coluna, sticky="ew",
+                   padx=(0, 4) if coluna == 0 else (4, 0))
+        ctk.CTkLabel(bloco, text=tecla, height=20, text_color=cor,
+                     font=("Segoe UI", 15, "bold")).pack(pady=(3, 0))
+        ctk.CTkLabel(bloco, text=descricao, height=16,
+                     text_color="#e4e9ee", font=("Segoe UI", 10)).pack(pady=(0, 4))
 
     def processar_comandos():
         if fechando:

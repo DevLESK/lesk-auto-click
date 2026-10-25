@@ -12,15 +12,15 @@ class MouseSelector:
         self.command = command
         self._valor = "Esquerdo"
         self._disabled = False
-        self.canvas = tk.Canvas(parent, width=220, height=172,
+        self.canvas = tk.Canvas(parent, width=220, height=180,
                                 bg="#242424", highlightthickness=1,
                                 highlightbackground="#242424",
                                 takefocus=True, cursor="hand2")
-        self._imagem = self.canvas.create_image(110, 86)
+        self._imagem = self.canvas.create_image(110, 90)
         self._areas = {"Esquerdo": "left", "Direito": "right"}
         self._textos = {}
-        for nome, x, box in (("Esquerdo", 31, (64, 10, 106, 86)),
-                             ("Direito", 189, (114, 10, 156, 86))):
+        for nome, x, box in (("Esquerdo", 31, (57, 6, 106, 92)),
+                             ("Direito", 189, (114, 6, 163, 92))):
             tag = "botao_" + nome
             # Áreas transparentes mantêm a seleção clicável sobre a imagem.
             self.canvas.create_rectangle(*box, fill="", outline="", tags=tag)
@@ -68,7 +68,7 @@ class MouseSelector:
             self.command(valor)
 
     def _clicar_imagem(self, event):
-        if 64 <= event.x <= 156 and 10 <= event.y <= 86:
+        if 57 <= event.x <= 163 and 6 <= event.y <= 92:
             self._escolher("Esquerdo" if event.x < 110 else "Direito")
 
     @staticmethod
@@ -80,9 +80,13 @@ class MouseSelector:
         raiz = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
         with Image.open(raiz / "assets" / arquivos[valor]) as original:
             arte = original.convert("RGBA")
-        arte.thumbnail((129, 170), Image.Resampling.LANCZOS)
-        imagem = Image.new("RGB", (220, 172), "#242424")
-        imagem.paste(arte, ((220 - arte.width) // 2, (172 - arte.height) // 2), arte)
+            # Aproveitar a área visual removendo apenas margens transparentes.
+            caixa = arte.getchannel("A").getbbox()
+            if caixa:
+                arte = arte.crop(caixa)
+        arte.thumbnail((144, 176), Image.Resampling.LANCZOS)
+        imagem = Image.new("RGB", (220, 180), "#242424")
+        imagem.paste(arte, ((220 - arte.width) // 2, (180 - arte.height) // 2), arte)
         return imagem
 
     def _desenhar(self):
