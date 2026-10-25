@@ -120,3 +120,53 @@ Melhorar a interface gráfica.
 
 ### Status
 ☐ Não iniciado
+
+## Sprint 004 — Botão e modo selecionáveis
+
+- Implementado em branch separada: esquerdo/direito, repetir/manter pressionado, F6 e parada F8.
+- Controle serializado do mouse, encerramento e liberação em falhas controladas.
+- Migração compatível das configurações; interface mantém atualizações na thread gráfica.
+- Testes: 21 aprovados com backend de mouse e interface simulados; compilação Python e diff sem erros.
+- Pendente: teste visual/atalhos no Windows, validação no Mu e geração/teste do executável.
+- Estado: aguardando revisão; sem merge ou publicação de versão.
+
+
+Correção após teste manual: André relatou janela engasgando ao arrastar e F6 demorado.
+A interface reconfigurava widgets 20 vezes por segundo mesmo sem mudança de estado.
+Agora só redesenha quando ligado/erro/modo mudam. Cliques repetidos não usam a
+pausa automática adicional do PyAutoGUI dentro do lock; o intervalo configurado
+continua controlando a cadência. Teste de regressão cobre polls ociosos sem redraw.
+Validação de fluidez no Windows permanece pendente.
+
+F6 ainda não ativou no teste manual de André na versão c456370. Restaurado disparo ao pressionar (comportamento original) e adicionado botão Ligar / Desligar para uso e diagnóstico independente do atalho. Validação real permanece pendente.
+
+
+Seletor visual aprovado por André: desenho de mouse clicável, seleção exclusiva
+esquerda/direita em verde, bloqueada durante execução. F6 alterna o escolhido;
+F8 somente para. Sem automação simultânea ou ativação por clique físico no jogo.
+Adicionado mouse_selector.py com Canvas do Tkinter, sem dependências novas.
+25 testes simulados aprovados, compilação e diff verificados.
+André confirmou versão anterior funcional no Roblox/Mu com elevação; nova
+interface aguarda inspeção visual e teste manual no Windows. Sem merge/Release.
+
+Ajuste visual solicitado: janela 280x420 (antes 320x600), mouse compacto com silhueta arredondada, seleção verde discreta e espaçamento reduzido. Título LESK AUTO CLICK. Sem alterações no motor/atalhos; validação visual no Windows pendente.
+
+André informou clique repetido funcional fora do Mu e sem registro dentro dele, mesmo com VS Code elevado. Hipótese de duração insuficiente: substituído clique instantâneo por mouseDown, pressão de 50 ms e mouseUp; modo pressionado preservado. Não há confirmação de correção no Mu. Testes simulados de sequência/liberação e falhas adicionados.
+
+Acabamento após screenshot de André: mouse rasterizado em 4x com Pillow já existente e redução LANCZOS; legenda fora do corpo; seletores unificados; organização em grid com botão de 32 px e margens. Janela 280x420 preservada. Mouse visualmente inspecionado; janela completa no Windows pendente. 29 testes passaram. Motor e atalhos não alterados.
+
+Pedido de André: removidos nomes laterais e legenda textual do mouse; seleção indicada visualmente pelo verde. Janela reduzida para 280x400 aproveitando a remoção da legenda.
+
+Refinamento solicitado: mouse com silhueta ergonômica em curvas Bézier, botões separados, rodinha detalhada, contornos suaves e verde exclusivo na seleção. Sem alterações funcionais ou de tamanho da janela.
+
+Implementação da arte Gamer aprovada: dois PNGs transparentes com LK verde metálico e braços do K em branco. Seletor usa imagem correspondente ao botão escolhido, sem textos laterais. Campos Modo/Velocidade alinhados em duas linhas e título LK AUTO CLICK. Janela 280x400. Incluídos recursos no AutoClick.spec e resolução por _MEIPASS para o executável. 30 testes simulados passaram; aparência completa/escala no Windows e novo executável pendentes. Motor e atalhos preservados.
+
+Refinamentos autorizados: removido botão Ligar/Desligar; F6 alterna e F8 para. Mouse ampliado em cerca de 15% com alvos atualizados; status ativo identifica botão, fontes de status/atalhos ampliadas, título curto LK Auto Click e ícone LK metálico em ICO multirresolução. Janela 280x400 e motor preservados. Teste manual no Windows pendente.
+
+Interrupção manual autorizada: somente no modo pressionar, pressionar fisicamente o MESMO botão interrompe a automação; status acompanha o estado desligado. Outro botão e modo repetir não mudam. Observador Windows WH_MOUSE_LL filtra LLMHF_INJECTED para ignorar entradas sintéticas e encaminha eventos por fila à GUI. Sem novas dependências; 33 testes simulados passaram. Integração nativa Windows/Mu pendente; não declarar validação real antes de André testar.
+
+Reorganização aprovada: mouse ampliado aproveitando margens transparentes, Modo/Velocidade centralizados com títulos acima dos campos, F6 e F8 em blocos destacados verde/vermelho. Mantida janela 280x400; nenhuma alteração de lógica. Conferência visual no Windows pendente.
+
+Correção baseada no print Windows: texto dos seletores centralizado; janela 280x430 para exibir integralmente os blocos F6/F8 sem reduzir o mouse. Descrições do rodapé com fonte 11 e maior margem inferior. Sem alteração funcional.
+
+Pedido aprovado: Modo e Velocidade lado a lado com títulos centralizados acima e campos iguais, acompanhando os blocos F6/F8. Mouse centralizado acima. Janela 380x370 para caber Manter pressionado integralmente e reduzir altura. Motor e atalhos preservados; conferência visual Windows pendente.

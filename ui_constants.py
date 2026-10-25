@@ -4,36 +4,36 @@ TEMA_COR = "green"
 ARQUIVO_ICONE = "icon.ico"
 ATALHO_ALTERNAR = "F6"
 
-TITULO_LIGADO = "Auto Click - Ligado"
-TITULO_DESLIGADO = "Auto Click - Desligado"
-TEXTO_TITULO = "ROBLOX AUTO CLICK"
+TITULO_LIGADO = "LK Auto Click"
+TITULO_DESLIGADO = "LK Auto Click"
+TEXTO_TITULO = "LK AUTO CLICK"
 TEXTO_STATUS_LIGADO = "● Ligado"
 TEXTO_STATUS_DESLIGADO = "● Desligado"
 TEXTO_VELOCIDADE = "Velocidade"
-TEXTO_ATALHO = "F6 = Ligar / Desligar"
+TEXTO_ATALHO = "F6  Liga/desliga   •   F8  Para"
 
-COR_VERDE_NEON = "#39FF14"
-COR_VERDE_LABEL = "#16b955"
+COR_VERDE_NEON = "#45d99a"
+COR_VERDE_LABEL = "#aab5bf"
 COR_VERDE_HOVER = "#2ecc71"
 COR_VERMELHO_STATUS = "#ff4d4d"
-COR_CINZA = "gray"
+COR_CINZA = "#aab5bf"
 
-FONTE_TITULO = ("Segoe UI", 19, "bold")
-FONTE_STATUS = ("Segoe UI", 15, "bold")
-FONTE_VELOCIDADE = ("Segoe UI", 13, "bold")
-FONTE_ATALHO = ("Segoe UI", 12, "bold")
+FONTE_TITULO = ("Segoe UI", 17, "bold")
+FONTE_STATUS = ("Segoe UI", 13, "bold")
+FONTE_VELOCIDADE = ("Segoe UI", 11)
+FONTE_ATALHO = ("Segoe UI", 11)
 
-GEOMETRIA_JANELA = "260x240"
+GEOMETRIA_JANELA = "380x370"
 JANELA_REDIMENSIONAVEL = (False, False)
 
-PADDING_TITULO = (20, 10)
-PADDING_STATUS = 5
-PADDING_VELOCIDADE = (15, 5)
-PADDING_ATALHO = 18
+PADDING_TITULO = (12, 2)
+PADDING_STATUS = 2
+PADDING_VELOCIDADE = (8, 3)
+PADDING_ATALHO = 10
 
-COMBO_LARGURA = 180
-COMBO_ALTURA = 35
-COMBO_RAIO_BORDA = 10
+COMBO_LARGURA = 168
+COMBO_ALTURA = 30
+COMBO_RAIO_BORDA = 8
 
 VELOCIDADES = ["Lenta", "Média", "Rápida"]
 VELOCIDADE_PADRAO = "Média"
@@ -42,3 +42,7 @@ INTERVALOS_POR_VELOCIDADE = {
     "Média": 0.05,
     "Rápida": 0.01,
 }
+
+ATALHO_PARAR = "F8"
+BOTOES = {"Esquerdo": "left", "Direito": "right"}
+MODOS = {"Cliques repetidos": "repetir", "Manter pressionado": "pressionar"}
