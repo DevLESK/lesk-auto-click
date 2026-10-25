@@ -95,3 +95,7 @@ Acabamento visual: seletor de mouse suavizado com Pillow (dependência já utili
 As imagens `assets/mouse_left.png` e `assets/mouse_right.png` representam as duas seleções e são incluídas pelo `AutoClick.spec`. O programa encontra os recursos tanto pelo código-fonte como no diretório temporário do PyInstaller. Artes geradas a partir do conceito visual aprovado por André; não são fotografias de hardware. Nenhuma alteração no motor dos cliques ou nos atalhos nesta etapa. A versão executável precisa ser reconstruída no Windows após validar o visual.
 
 A interface usa ícone LK, título curto e status com o botão ativo. F6 alterna e F8 para; selecionar o mouse não ativa a execução.
+
+### Interromper manualmente o modo pressionado
+
+No Windows, um clique físico no mesmo botão selecionado interrompe apenas o modo **Manter pressionado**, e o status volta a desligado. F6 retoma. O outro botão permanece livre para uso manual. **Cliques repetidos não são alterados por cliques físicos.** O observador ignora eventos marcados pelo Windows como injetados e é removido ao encerrar. Essa integração requer teste manual na máquina Windows; testes automatizados simulam os eventos.

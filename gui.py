@@ -7,6 +7,7 @@ import keyboard
 
 from clicker import AutoClicker
 from mouse_selector import MouseSelector
+from physical_mouse import PhysicalMouseListener
 from config import carregar_config, salvar_config
 from ui_constants import (
     ARQUIVO_ICONE,
@@ -95,6 +96,7 @@ def iniciar_aplicacao():
 
     comandos = queue.SimpleQueue()
     fechando = False
+    mouse_fisico = PhysicalMouseListener(lambda botao: comandos.put(("fisico", botao)))
 
     estilo_seletor = dict(
         width=COMBO_LARGURA, height=COMBO_ALTURA, corner_radius=COMBO_RAIO_BORDA,
@@ -202,7 +204,14 @@ def iniciar_aplicacao():
             return
         while not comandos.empty():
             comando = comandos.get()
-            if comando == "alternar":
+            if isinstance(comando, tuple):
+                # Só o MESMO botão físico interrompe o modo pressionado.
+                # O outro botão e todos os cliques no modo repetir são livres.
+                ligado, _erro = clicker.estado()
+                if (ligado and config["modo"] == "pressionar"
+                        and comando[1] == config["botao"]):
+                    clicker.desligar()
+            elif comando == "alternar":
                 alternar_tkinter()
             else:
                 clicker.desligar()
@@ -225,7 +234,9 @@ def iniciar_aplicacao():
 
     janela.protocol("WM_DELETE_WINDOW", fechar)
     try:
+        mouse_fisico.start()
         janela.mainloop()
     finally:
+        mouse_fisico.stop()
         clicker.parar()
         keyboard.unhook_all_hotkeys()

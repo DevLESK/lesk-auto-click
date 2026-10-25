@@ -13,6 +13,7 @@ class TestGui(unittest.TestCase):
         clicker.botao, clicker.modo = "right", "pressionar"
         combos = [Mock(), Mock(), Mock()]
         seletor_module = Mock()
+        physical_module = Mock()
         seletor_module.MouseSelector.return_value = combos[0]
         ctk.CTkComboBox.side_effect = combos[1:]
         janela = ctk.CTk.return_value
@@ -25,7 +26,8 @@ class TestGui(unittest.TestCase):
         gui = importlib.util.module_from_spec(spec)
         with patch.dict(sys.modules, {"customtkinter": ctk, "keyboard": keyboard,
                                      "clicker": clicker_module, "config": config_module,
-                                     "mouse_selector": seletor_module}):
+                                     "mouse_selector": seletor_module,
+                                     "physical_mouse": physical_module}):
             spec.loader.exec_module(gui)
             def executar_interface():
                 hotkeys = {c.args[0]: c.args[1] for c in keyboard.add_hotkey.call_args_list}
@@ -62,10 +64,33 @@ class TestGui(unittest.TestCase):
                     for c in ctk.CTkLabel.return_value.configure.call_args_list))
                 combos[0].configure.assert_called_with(state="disabled")
                 combos[1].configure.assert_called_with(state="disabled")
+                fisico = physical_module.PhysicalMouseListener.call_args.args[0]
+                # Direito pressionado: esquerdo físico não interfere.
+                antes = clicker.desligar.call_count
+                fisico("left")
+                poll()
+                self.assertEqual(clicker.desligar.call_count, antes)
+                fisico("right")
+                poll()
+                self.assertEqual(clicker.desligar.call_count, antes + 1)
+                # Repetição: nenhum clique físico altera o funcionamento.
+                config["modo"] = "repetir"
+                antes = clicker.desligar.call_count
+                fisico("right")
+                fisico("left")
+                poll()
+                self.assertEqual(clicker.desligar.call_count, antes)
+                config["modo"] = "pressionar"
+                config["botao"] = "left"
+                fisico("left")
+                poll()
+                self.assertEqual(clicker.desligar.call_count, antes + 1)
                 fechar = janela.protocol.call_args.args[1]
                 fechar()
                 janela.destroy.assert_called_once()
             janela.mainloop.side_effect = executar_interface
             gui.iniciar_aplicacao()
+        physical_module.PhysicalMouseListener.return_value.start.assert_called_once()
+        physical_module.PhysicalMouseListener.return_value.stop.assert_called_once()
         self.assertTrue(clicker.parar.called)
         self.assertTrue(keyboard.unhook_all_hotkeys.called)
