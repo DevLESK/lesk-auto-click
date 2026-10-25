@@ -72,7 +72,8 @@ def iniciar_aplicacao():
 
     conteudo = ctk.CTkFrame(janela, fg_color="transparent")
     conteudo.pack(fill="both", expand=True, padx=20, pady=12)
-    conteudo.grid_columnconfigure(0, weight=1)
+    conteudo.grid_columnconfigure(0, weight=0, minsize=72)
+    conteudo.grid_columnconfigure(1, weight=1)
 
     titulo = ctk.CTkLabel(
         conteudo,
@@ -81,7 +82,7 @@ def iniciar_aplicacao():
         font=FONTE_TITULO,
         text_color=COR_VERDE_NEON
     )
-    titulo.grid(row=0, column=0, pady=(0, 2))
+    titulo.grid(row=0, column=0, columnspan=2, pady=(0, 2))
 
     status_label = ctk.CTkLabel(
         conteudo,
@@ -90,7 +91,7 @@ def iniciar_aplicacao():
         font=FONTE_STATUS,
         text_color=COR_VERMELHO_STATUS
     )
-    status_label.grid(row=1, column=0)
+    status_label.grid(row=1, column=0, columnspan=2)
 
     comandos = queue.SimpleQueue()
     fechando = False
@@ -106,16 +107,16 @@ def iniciar_aplicacao():
     def criar_seletor(texto, opcoes, chave):
         ctk.CTkLabel(conteudo, text=texto, height=20,
                      font=FONTE_VELOCIDADE, text_color=COR_VERDE_LABEL).grid(
-                         row=3, column=0, sticky="w", pady=(6, 2))
+                         row=3, column=0, sticky="w", pady=(8, 0))
         combo = ctk.CTkComboBox(conteudo, values=list(opcoes), state="readonly",
                               **estilo_seletor)
         combo.set(next(nome for nome, valor in opcoes.items() if valor == config[chave]))
-        combo.grid(row=4, column=0, sticky="ew")
+        combo.grid(row=3, column=1, sticky="ew", pady=(8, 0))
         return combo
 
     combo_botao = MouseSelector(conteudo)
     combo_botao.set(next(nome for nome, valor in BOTOES.items() if valor == config["botao"]))
-    combo_botao.canvas.grid(row=2, column=0, pady=(2, 0))
+    combo_botao.canvas.grid(row=2, column=0, columnspan=2, pady=(2, 0))
     combo_modo = criar_seletor("Modo", MODOS, "modo")
 
     velocidade_label = ctk.CTkLabel(
@@ -125,11 +126,11 @@ def iniciar_aplicacao():
         font=FONTE_VELOCIDADE,
         text_color=COR_VERDE_LABEL
     )
-    velocidade_label.grid(row=5, column=0, sticky="w", pady=(8, 2))
+    velocidade_label.grid(row=4, column=0, sticky="w", pady=(8, 0))
 
     combo_velocidade = ctk.CTkComboBox(
         conteudo, values=VELOCIDADES, state="readonly", **estilo_seletor)
-    combo_velocidade.grid(row=6, column=0, sticky="ew")
+    combo_velocidade.grid(row=4, column=1, sticky="ew", pady=(8, 0))
 
     combo_velocidade.set(config.get("velocidade", VELOCIDADE_PADRAO))
 
@@ -194,7 +195,7 @@ def iniciar_aplicacao():
         font=FONTE_ATALHO,
         text_color=COR_CINZA
     )
-    atalho_label.grid(row=8, column=0, pady=(8, 0))
+    atalho_label.grid(row=6, column=0, columnspan=2, pady=(8, 0))
 
     def processar_comandos():
         if fechando:
@@ -221,7 +222,7 @@ def iniciar_aplicacao():
                   height=32, corner_radius=8, fg_color="#32c78b",
                   hover_color="#28ae79", text_color="#10251b",
                   font=("Segoe UI", 12, "bold")).grid(
-                      row=7, column=0, sticky="ew", pady=(14, 0))
+                      row=5, column=0, columnspan=2, sticky="ew", pady=(14, 0))
     keyboard.add_hotkey(ATALHO_ALTERNAR, alternar)
     keyboard.add_hotkey(ATALHO_PARAR, lambda: comandos.put("parar"))
     atualizar_titulo()

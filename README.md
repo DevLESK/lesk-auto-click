@@ -89,3 +89,7 @@ André confirmou funcionamento no Roblox e no Mu após executar o aplicativo com
 Cliques repetidos agora mantêm o botão pressionado por 50 ms antes de soltar, além do intervalo selecionado entre cliques. É um ajuste de compatibilidade para aplicativos que não observam pressão/soltura instantâneas. Funcionamento dessa alteração no Mu ainda precisa de teste manual.
 
 Acabamento visual: seletor de mouse suavizado com Pillow (dependência já utilizada pelo projeto), legenda externa e campos padronizados. Layout em grid preserva espaço para o botão inferior. Validação de escala/DPI e aparência completa no Windows permanece pendente.
+
+### Arte Gamer LK
+
+As imagens `assets/mouse_left.png` e `assets/mouse_right.png` representam as duas seleções e são incluídas pelo `AutoClick.spec`. O programa encontra os recursos tanto pelo código-fonte como no diretório temporário do PyInstaller. Artes geradas a partir do conceito visual aprovado por André; não são fotografias de hardware. Nenhuma alteração no motor dos cliques ou nos atalhos nesta etapa. A versão executável precisa ser reconstruída no Windows após validar o visual.

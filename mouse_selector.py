@@ -1,7 +1,10 @@
 """Seletor visual de um único botão; não emite entradas de mouse."""
 import tkinter as tk
+import sys
+from pathlib import Path
+from functools import lru_cache
 
-from PIL import Image, ImageDraw, ImageTk
+from PIL import Image, ImageTk
 
 
 class MouseSelector:
@@ -9,15 +12,15 @@ class MouseSelector:
         self.command = command
         self._valor = "Esquerdo"
         self._disabled = False
-        self.canvas = tk.Canvas(parent, width=220, height=110,
+        self.canvas = tk.Canvas(parent, width=220, height=150,
                                 bg="#242424", highlightthickness=1,
                                 highlightbackground="#242424",
                                 takefocus=True, cursor="hand2")
-        self._imagem = self.canvas.create_image(110, 54)
+        self._imagem = self.canvas.create_image(110, 75)
         self._areas = {"Esquerdo": "left", "Direito": "right"}
         self._textos = {}
-        for nome, x, box in (("Esquerdo", 31, (71, 5, 108, 51)),
-                             ("Direito", 189, (112, 5, 149, 51))):
+        for nome, x, box in (("Esquerdo", 31, (70, 8, 106, 75)),
+                             ("Direito", 189, (114, 8, 150, 75))):
             tag = "botao_" + nome
             # Áreas transparentes mantêm a seleção clicável sobre a imagem.
             self.canvas.create_rectangle(*box, fill="", outline="", tags=tag)
@@ -65,60 +68,22 @@ class MouseSelector:
             self.command(valor)
 
     def _clicar_imagem(self, event):
-        if 70 <= event.x <= 150 and 4 <= event.y <= 52:
+        if 70 <= event.x <= 150 and 8 <= event.y <= 75:
             self._escolher("Esquerdo" if event.x < 110 else "Direito")
 
     @staticmethod
+    @lru_cache(maxsize=2)
     def renderizar_mouse(valor):
-        """Rasterizar em 4x e reduzir suaviza o contorno no Tk/Windows."""
-        escala = 4
-        imagem = Image.new("RGB", (220 * escala, 108 * escala), "#242424")
-        desenho = ImageDraw.Draw(imagem)
-
-        def curva(inicio, trechos):
-            pontos = [inicio]
-            atual = inicio
-            for c1, c2, fim in trechos:
-                for passo in range(1, 33):
-                    t = passo / 32
-                    u = 1 - t
-                    pontos.append((u**3 * atual[0] + 3*u*u*t*c1[0] +
-                                   3*u*t*t*c2[0] + t**3*fim[0],
-                                   u**3 * atual[1] + 3*u*u*t*c1[1] +
-                                   3*u*t*t*c2[1] + t**3*fim[1]))
-                atual = fim
-            return [(round(x * escala), round(y * escala)) for x, y in pontos]
-
-        corpo = curva((110, 4), [
-            ((84, 4), (76, 15), (76, 37)),
-            ((76, 57), (68, 72), (73, 87)),
-            ((77, 102), (93, 105), (110, 105)),
-            ((127, 105), (143, 102), (147, 87)),
-            ((152, 72), (144, 57), (144, 37)),
-            ((144, 15), (136, 4), (110, 4))])
-        sombra = [(x, y + 2 * escala) for x, y in corpo]
-        desenho.polygon(sombra, fill="#171b1e")
-        desenho.polygon(corpo, fill="#2c3239")
-        desenho.line(corpo + [corpo[0]], fill="#65717d", width=escala)
-        esquerda = curva((107, 9), [
-            ((87, 9), (81, 18), (81, 36)),
-            ((81, 42), (80, 47), (79, 51)),
-            ((86, 54), (98, 54), (107, 52)),
-            ((107, 40), (107, 21), (107, 9))])
-        direita = [(220 * escala - x, y) for x, y in esquerda]
-        for nome, pontos in (("Esquerdo", esquerda), ("Direito", direita)):
-            escolhido = nome == valor
-            desenho.polygon(pontos, fill="#1d5c44" if escolhido else "#39434e")
-            desenho.line(pontos + [pontos[0]],
-                          fill="#45d99a" if escolhido else "#6c7b89", width=escala)
-        desenho.rounded_rectangle((106*escala, 18*escala, 114*escala, 37*escala),
-                                  radius=4*escala, fill="#141a20", outline="#6c7884", width=escala)
-        desenho.rounded_rectangle((108*escala, 21*escala, 112*escala, 33*escala),
-                                  radius=2*escala, fill="#a1acb7")
-        # Detalhes discretos de pegada e encaixe, sem texto dentro do mouse.
-        desenho.arc((78*escala, 61*escala, 142*escala, 98*escala),
-                     start=12, end=168, fill="#414d58", width=escala)
-        return imagem.resize((220, 108), Image.Resampling.LANCZOS)
+        arquivos = {"Esquerdo": "mouse_left.png", "Direito": "mouse_right.png"}
+        if valor not in arquivos:
+            raise ValueError("Botão inválido")
+        raiz = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+        with Image.open(raiz / "assets" / arquivos[valor]) as original:
+            arte = original.convert("RGBA")
+        arte.thumbnail((112, 148), Image.Resampling.LANCZOS)
+        imagem = Image.new("RGB", (220, 150), "#242424")
+        imagem.paste(arte, ((220 - arte.width) // 2, (150 - arte.height) // 2), arte)
+        return imagem
 
     def _desenhar(self):
         self._foto = ImageTk.PhotoImage(self.renderizar_mouse(self._valor), master=self.canvas)

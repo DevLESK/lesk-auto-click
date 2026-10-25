@@ -69,3 +69,5 @@ Acabamento após screenshot de André: mouse rasterizado em 4x com Pillow já ex
 Pedido de André: removidos nomes laterais e legenda textual do mouse; seleção indicada visualmente pelo verde. Janela reduzida para 280x400 aproveitando a remoção da legenda.
 
 Refinamento solicitado: mouse com silhueta ergonômica em curvas Bézier, botões separados, rodinha detalhada, contornos suaves e verde exclusivo na seleção. Sem alterações funcionais ou de tamanho da janela.
+
+Implementação da arte Gamer aprovada: dois PNGs transparentes com LK verde metálico e braços do K em branco. Seletor usa imagem correspondente ao botão escolhido, sem textos laterais. Campos Modo/Velocidade alinhados em duas linhas e título LK AUTO CLICK. Janela 280x400. Incluídos recursos no AutoClick.spec e resolução por _MEIPASS para o executável. 30 testes simulados passaram; aparência completa/escala no Windows e novo executável pendentes. Motor e atalhos preservados.
