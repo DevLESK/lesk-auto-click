@@ -73,7 +73,7 @@ def iniciar_aplicacao():
 
     conteudo = ctk.CTkFrame(janela, fg_color="transparent")
     conteudo.pack(fill="both", expand=True, padx=16, pady=8)
-    conteudo.grid_columnconfigure(0, weight=1)
+    conteudo.grid_columnconfigure((0, 1), weight=1, uniform="opcoes")
 
     titulo = ctk.CTkLabel(
         conteudo,
@@ -82,7 +82,7 @@ def iniciar_aplicacao():
         font=FONTE_TITULO,
         text_color=COR_VERDE_NEON
     )
-    titulo.grid(row=0, column=0, pady=(0, 2))
+    titulo.grid(row=0, column=0, columnspan=2, pady=(0, 2))
 
     status_label = ctk.CTkLabel(
         conteudo,
@@ -91,7 +91,7 @@ def iniciar_aplicacao():
         font=FONTE_STATUS,
         text_color=COR_VERMELHO_STATUS
     )
-    status_label.grid(row=1, column=0)
+    status_label.grid(row=1, column=0, columnspan=2)
 
     comandos = queue.SimpleQueue()
     fechando = False
@@ -113,12 +113,12 @@ def iniciar_aplicacao():
         combo = ctk.CTkComboBox(conteudo, values=list(opcoes), state="readonly",
                               **estilo_seletor)
         combo.set(next(nome for nome, valor in opcoes.items() if valor == config[chave]))
-        combo.grid(row=4, column=0)
+        combo.grid(row=4, column=0, sticky="ew", padx=(0, 4))
         return combo
 
     combo_botao = MouseSelector(conteudo)
     combo_botao.set(next(nome for nome, valor in BOTOES.items() if valor == config["botao"]))
-    combo_botao.canvas.grid(row=2, column=0, pady=(2, 0))
+    combo_botao.canvas.grid(row=2, column=0, columnspan=2, pady=(2, 0))
     combo_modo = criar_seletor("Modo", MODOS, "modo")
 
     velocidade_label = ctk.CTkLabel(
@@ -128,11 +128,11 @@ def iniciar_aplicacao():
         font=FONTE_VELOCIDADE,
         text_color=COR_VERDE_LABEL
     )
-    velocidade_label.grid(row=5, column=0, pady=(6, 2))
+    velocidade_label.grid(row=3, column=1, pady=(0, 2))
 
     combo_velocidade = ctk.CTkComboBox(
         conteudo, values=VELOCIDADES, state="readonly", **estilo_seletor)
-    combo_velocidade.grid(row=6, column=0)
+    combo_velocidade.grid(row=4, column=1, sticky="ew", padx=(4, 0))
 
     combo_velocidade.set(config.get("velocidade", VELOCIDADE_PADRAO))
 
@@ -191,7 +191,7 @@ def iniciar_aplicacao():
     combo_velocidade.configure(command=mudar_velocidade)
 
     atalhos = ctk.CTkFrame(conteudo, fg_color="transparent")
-    atalhos.grid(row=7, column=0, sticky="ew", pady=(10, 0))
+    atalhos.grid(row=5, column=0, columnspan=2, sticky="ew", pady=(10, 0))
     atalhos.grid_columnconfigure((0, 1), weight=1, uniform="atalhos")
     for coluna, tecla, descricao, cor, fundo in (
         (0, "F6", "Liga / desliga", "#45d99a", "#203c32"),

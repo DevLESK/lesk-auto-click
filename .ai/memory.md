@@ -79,3 +79,5 @@ Interrupção manual autorizada: somente no modo pressionar, pressionar fisicame
 Reorganização aprovada: mouse ampliado aproveitando margens transparentes, Modo/Velocidade centralizados com títulos acima dos campos, F6 e F8 em blocos destacados verde/vermelho. Mantida janela 280x400; nenhuma alteração de lógica. Conferência visual no Windows pendente.
 
 Correção baseada no print Windows: texto dos seletores centralizado; janela 280x430 para exibir integralmente os blocos F6/F8 sem reduzir o mouse. Descrições do rodapé com fonte 11 e maior margem inferior. Sem alteração funcional.
+
+Pedido aprovado: Modo e Velocidade lado a lado com títulos centralizados acima e campos iguais, acompanhando os blocos F6/F8. Mouse centralizado acima. Janela 380x370 para caber Manter pressionado integralmente e reduzir altura. Motor e atalhos preservados; conferência visual Windows pendente.
