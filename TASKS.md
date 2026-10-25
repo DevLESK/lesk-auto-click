@@ -160,3 +160,5 @@ Pedido de André: removidos nomes laterais e legenda textual do mouse; seleção
 Refinamento solicitado: mouse com silhueta ergonômica em curvas Bézier, botões separados, rodinha detalhada, contornos suaves e verde exclusivo na seleção. Sem alterações funcionais ou de tamanho da janela.
 
 Implementação da arte Gamer aprovada: dois PNGs transparentes com LK verde metálico e braços do K em branco. Seletor usa imagem correspondente ao botão escolhido, sem textos laterais. Campos Modo/Velocidade alinhados em duas linhas e título LK AUTO CLICK. Janela 280x400. Incluídos recursos no AutoClick.spec e resolução por _MEIPASS para o executável. 30 testes simulados passaram; aparência completa/escala no Windows e novo executável pendentes. Motor e atalhos preservados.
+
+Refinamentos autorizados: removido botão Ligar/Desligar; F6 alterna e F8 para. Mouse ampliado em cerca de 15% com alvos atualizados; status ativo identifica botão, fontes de status/atalhos ampliadas, título curto LK Auto Click e ícone LK metálico em ICO multirresolução. Janela 280x400 e motor preservados. Teste manual no Windows pendente.

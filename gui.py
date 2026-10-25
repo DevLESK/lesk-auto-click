@@ -151,7 +151,7 @@ def iniciar_aplicacao():
         if ligado:
             janela.title(TITULO_LIGADO)
             status_label.configure(
-                text=TEXTO_STATUS_LIGADO,
+                text="● Ativo · " + ("Direito" if config["botao"] == "right" else "Esquerdo"),
                 text_color=COR_VERDE_NEON
             )
         else:
@@ -195,7 +195,7 @@ def iniciar_aplicacao():
         font=FONTE_ATALHO,
         text_color=COR_CINZA
     )
-    atalho_label.grid(row=6, column=0, columnspan=2, pady=(8, 0))
+    atalho_label.grid(row=5, column=0, columnspan=2, pady=(18, 0))
 
     def processar_comandos():
         if fechando:
@@ -218,11 +218,6 @@ def iniciar_aplicacao():
         keyboard.unhook_all_hotkeys()
         janela.destroy()
 
-    ctk.CTkButton(conteudo, text="Ligar / Desligar", command=alternar,
-                  height=32, corner_radius=8, fg_color="#32c78b",
-                  hover_color="#28ae79", text_color="#10251b",
-                  font=("Segoe UI", 12, "bold")).grid(
-                      row=5, column=0, columnspan=2, sticky="ew", pady=(14, 0))
     keyboard.add_hotkey(ATALHO_ALTERNAR, alternar)
     keyboard.add_hotkey(ATALHO_PARAR, lambda: comandos.put("parar"))
     atualizar_titulo()

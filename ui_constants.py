@@ -4,13 +4,13 @@ TEMA_COR = "green"
 ARQUIVO_ICONE = "icon.ico"
 ATALHO_ALTERNAR = "F6"
 
-TITULO_LIGADO = "LK Auto Click - Ligado"
-TITULO_DESLIGADO = "LK Auto Click - Desligado"
+TITULO_LIGADO = "LK Auto Click"
+TITULO_DESLIGADO = "LK Auto Click"
 TEXTO_TITULO = "LK AUTO CLICK"
 TEXTO_STATUS_LIGADO = "● Ligado"
 TEXTO_STATUS_DESLIGADO = "● Desligado"
 TEXTO_VELOCIDADE = "Velocidade"
-TEXTO_ATALHO = "F6  Liga / desliga     •     F8  Para"
+TEXTO_ATALHO = "F6  Liga/desliga   •   F8  Para"
 
 COR_VERDE_NEON = "#45d99a"
 COR_VERDE_LABEL = "#aab5bf"
@@ -19,9 +19,9 @@ COR_VERMELHO_STATUS = "#ff4d4d"
 COR_CINZA = "#aab5bf"
 
 FONTE_TITULO = ("Segoe UI", 17, "bold")
-FONTE_STATUS = ("Segoe UI", 12, "bold")
+FONTE_STATUS = ("Segoe UI", 13, "bold")
 FONTE_VELOCIDADE = ("Segoe UI", 11)
-FONTE_ATALHO = ("Segoe UI", 10)
+FONTE_ATALHO = ("Segoe UI", 11)
 
 GEOMETRIA_JANELA = "280x400"
 JANELA_REDIMENSIONAVEL = (False, False)

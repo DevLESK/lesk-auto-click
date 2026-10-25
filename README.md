@@ -45,7 +45,7 @@ Versão 1.0
 - Clique na metade **Esquerdo** ou **Direito** do desenho do mouse; a seleção fica verde. Depois escolha **Cliques repetidos** ou **Manter pressionado**.
 - Selecionar o desenho não liga a automação. Apenas um botão é automatizado por vez; F6 liga/desliga e F8 para.
 - O seletor aceita foco por Tab e seleção pelas setas esquerda/direita.
-- **F6** liga/desliga; **F8** interrompe e libera o botão. Os atalhos disparam ao pressionar a tecla, como na versão original; use toques curtos. Há também um botão Ligar / Desligar na janela.
+- **F6** liga/desliga; **F8** interrompe e libera o botão. Os atalhos disparam ao pressionar a tecla, como na versão original; use toques curtos. A ativação é feita apenas pelos atalhos F6/F8, sem botão na janela.
 - O aplicativo sempre inicia desligado. Posicione o mouse no destino antes de ativar.
 - Botão e modo ficam bloqueados enquanto estiver ligado. A velocidade só se aplica aos cliques repetidos.
 - Preferências antigas são completadas automaticamente com esquerdo/cliques repetidos; escolhas e chaves extras são preservadas.
@@ -93,3 +93,5 @@ Acabamento visual: seletor de mouse suavizado com Pillow (dependência já utili
 ### Arte Gamer LK
 
 As imagens `assets/mouse_left.png` e `assets/mouse_right.png` representam as duas seleções e são incluídas pelo `AutoClick.spec`. O programa encontra os recursos tanto pelo código-fonte como no diretório temporário do PyInstaller. Artes geradas a partir do conceito visual aprovado por André; não são fotografias de hardware. Nenhuma alteração no motor dos cliques ou nos atalhos nesta etapa. A versão executável precisa ser reconstruída no Windows após validar o visual.
+
+A interface usa ícone LK, título curto e status com o botão ativo. F6 alterna e F8 para; selecionar o mouse não ativa a execução.

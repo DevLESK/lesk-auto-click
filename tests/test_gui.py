@@ -41,8 +41,8 @@ class TestGui(unittest.TestCase):
                 clicker.alternar.assert_not_called()
                 poll()
                 clicker.alternar.assert_called_once()
-                botao = ctk.CTkButton.call_args.kwargs["command"]
-                botao()
+                ctk.CTkButton.assert_not_called()
+                hotkeys["F6"]()
                 poll()
                 self.assertEqual(clicker.alternar.call_count, 2)
                 hotkeys["F8"]()
@@ -57,6 +57,9 @@ class TestGui(unittest.TestCase):
                 combos[2].configure.assert_called_with(state="disabled")
                 clicker.estado.return_value = (True, None)
                 poll()
+                self.assertTrue(any(
+                    c.kwargs.get("text") == "● Ativo · Direito"
+                    for c in ctk.CTkLabel.return_value.configure.call_args_list))
                 combos[0].configure.assert_called_with(state="disabled")
                 combos[1].configure.assert_called_with(state="disabled")
                 fechar = janela.protocol.call_args.args[1]
