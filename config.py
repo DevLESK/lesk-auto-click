@@ -8,7 +8,9 @@ CONFIG_PADRAO = {
     "velocidade": "Média",
     "intervalo_clique": 0.05,
     "botao": "left",
-    "modo": "repetir"
+    "modo": "repetir",
+    "drop_intervalo_ms": 50,
+    "drop_recolher": True
 }
 
 
@@ -28,6 +30,11 @@ def completar_config(config):
     if (isinstance(intervalo, bool) or not isinstance(intervalo, (int, float))
             or not math.isfinite(intervalo) or intervalo <= 0):
         config_completa["intervalo_clique"] = CONFIG_PADRAO["intervalo_clique"]
+    if (type(config_completa["drop_intervalo_ms"]) is not int
+            or not 20 <= config_completa["drop_intervalo_ms"] <= 5000):
+        config_completa["drop_intervalo_ms"] = 50
+    if type(config_completa["drop_recolher"]) is not bool:
+        config_completa["drop_recolher"] = True
     return config_completa
 
 

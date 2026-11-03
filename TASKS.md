@@ -170,3 +170,13 @@ Reorganização aprovada: mouse ampliado aproveitando margens transparentes, Mod
 Correção baseada no print Windows: texto dos seletores centralizado; janela 280x430 para exibir integralmente os blocos F6/F8 sem reduzir o mouse. Descrições do rodapé com fonte 11 e maior margem inferior. Sem alteração funcional.
 
 Pedido aprovado: Modo e Velocidade lado a lado com títulos centralizados acima e campos iguais, acompanhando os blocos F6/F8. Mouse centralizado acima. Janela 380x370 para caber Manter pressionado integralmente e reduzir altura. Motor e atalhos preservados; conferência visual Windows pendente.
+
+## Unificação Auto Click + LK Drop
+
+- Responsável: Lesk Dev Senior, escopo delegado pelo Tech Lead.
+- Duas abas no mesmo executável, atalhos globais únicos e exclusão entre motores.
+- LK Drop extraído do pacote versão 5, preservando tempos 50/100/180 ms e coleta opcional de cinco Espaços.
+- Configurações compatíveis; pontos/HWND somente em memória.
+- Liberação síncrona, cancelamento e geração de callbacks protegem parada/reinício/troca de aba.
+- 46 testes simulados passaram no Linux; compilação e diff verificados.
+- Pendente: revisão do Tech Lead e teste manual Windows/MU do executável unificado. Sem merge ou Release.

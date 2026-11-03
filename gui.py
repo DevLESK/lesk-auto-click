@@ -5,6 +5,9 @@ import queue
 import customtkinter as ctk
 import keyboard
 
+from automation import Automations
+from drop import LKDrop
+from drop_windows import WindowsInput
 from clicker import AutoClicker
 from mouse_selector import MouseSelector
 from physical_mouse import PhysicalMouseListener
@@ -71,7 +74,17 @@ def iniciar_aplicacao():
     janela.geometry(GEOMETRIA_JANELA)
     janela.resizable(*JANELA_REDIMENSIONAVEL)
 
-    conteudo = ctk.CTkFrame(janela, fg_color="transparent")
+    abas = ctk.CTkTabview(janela)
+    abas.pack(fill="both", expand=True, padx=0, pady=0)
+    auto_aba = abas.add("Auto Click")
+    drop_aba = abas.add("LK Drop")
+    entrada = WindowsInput()
+    drop = LKDrop(janela, entrada, lambda: entrada.raiz(janela.winfo_id()),
+                  config["drop_intervalo_ms"], config["drop_recolher"])
+    controle = Automations(clicker, drop)
+    abas.configure(command=lambda: controle.selecionar(abas.get()))
+
+    conteudo = ctk.CTkFrame(auto_aba, fg_color="transparent")
     conteudo.pack(fill="both", expand=True, padx=16, pady=8)
     conteudo.grid_columnconfigure((0, 1), weight=1, uniform="opcoes")
 
@@ -136,12 +149,68 @@ def iniciar_aplicacao():
 
     combo_velocidade.set(config.get("velocidade", VELOCIDADE_PADRAO))
 
+    drop_frame = ctk.CTkFrame(drop_aba, fg_color="transparent")
+    drop_frame.pack(fill="both", expand=True, padx=12, pady=8)
+    drop_frame.grid_columnconfigure((0, 1), weight=1, uniform="pontos")
+    ctk.CTkLabel(drop_frame, text="LK DROP", font=FONTE_TITULO,
+                 text_color=COR_VERDE_NEON).grid(row=0, column=0, columnspan=2, pady=(0, 8))
+    pontos_labels = {}
+    for coluna, ponto, texto in ((0, "box", "F2 · Box"), (1, "ground", "F3 · Chão")):
+        bloco = ctk.CTkFrame(drop_frame, fg_color="#30363e", corner_radius=8)
+        bloco.grid(row=1, column=coluna, sticky="ew", padx=4, pady=8)
+        ctk.CTkLabel(bloco, text=texto, text_color=COR_VERDE_NEON).pack(pady=(10, 0))
+        pontos_labels[ponto] = ctk.CTkLabel(bloco, text="Não marcado")
+        pontos_labels[ponto].pack(pady=(0, 10))
+    ctk.CTkLabel(drop_frame, text="Intervalo entre ações (ms)").grid(
+        row=2, column=0, columnspan=2, pady=(12, 2))
+    intervalo_drop = ctk.StringVar(value=str(drop.intervalo))
+    campo_intervalo = ctk.CTkEntry(drop_frame, textvariable=intervalo_drop,
+                                  width=120, justify="center")
+    campo_intervalo.grid(row=3, column=0, columnspan=2)
+    recolher_drop = ctk.BooleanVar(value=drop.recolher)
+
+    def salvar_drop(*_args):
+        if drop.ligado:
+            return
+        try:
+            valor = int(intervalo_drop.get())
+            if not 20 <= valor <= 5000:
+                raise ValueError
+        except ValueError:
+            drop.status = "Use intervalo inteiro entre 20 e 5000 ms."
+            return
+        drop.intervalo, drop.recolher = valor, bool(recolher_drop.get())
+        config["drop_intervalo_ms"] = valor
+        config["drop_recolher"] = drop.recolher
+        salvar_config(config)
+
+    campo_intervalo.bind("<FocusOut>", salvar_drop)
+    campo_intervalo.bind("<Return>", salvar_drop)
+    check_recolher = ctk.CTkCheckBox(drop_frame, text="Recolher com Espaço (5 vezes)",
+                                   variable=recolher_drop, command=salvar_drop)
+    check_recolher.grid(row=4, column=0, columnspan=2, pady=18)
+    status_drop = ctk.CTkLabel(drop_frame, text=drop.status, wraplength=320,
+                              text_color=COR_VERDE_LABEL, height=50)
+    status_drop.grid(row=5, column=0, columnspan=2, pady=8)
+    ctk.CTkLabel(drop_frame, text="F6  Liga / desliga     •     F8  Para tudo",
+                 font=("Segoe UI", 14, "bold"), text_color=COR_VERDE_NEON).grid(
+                     row=6, column=0, columnspan=2, pady=10)
+    ultimo_drop = None
     ultimo_estado = None
 
     def atualizar_titulo():
-        nonlocal ultimo_estado
+        nonlocal ultimo_estado, ultimo_drop
+        estado_drop = (drop.ligado, drop.status, tuple(drop.pontos.items()))
+        if estado_drop != ultimo_drop:
+            ultimo_drop = estado_drop
+            status_drop.configure(text=drop.status)
+            for ponto, label in pontos_labels.items():
+                label.configure(text=str(drop.pontos.get(ponto, "Não marcado")))
+            campo_intervalo.configure(state="disabled" if drop.ligado else "normal")
+            check_recolher.configure(state="disabled" if drop.ligado else "normal")
         ligado, erro = clicker.estado()
-        estado_visual = (ligado, erro, config["modo"], config["botao"])
+        estado_visual = (ligado, erro, config["modo"], config["botao"],
+                         controle.aba, estado_drop)
         if estado_visual == ultimo_estado:
             return
         ultimo_estado = estado_visual
@@ -150,14 +219,18 @@ def iniciar_aplicacao():
         combo_velocidade.configure(
             state="disabled" if config["modo"] == "pressionar" else "readonly"
         )
+        if controle.aba == "LK Drop":
+            janela.title("LK Drop · " + ("Ativo" if drop.ligado else "Parado"))
         if ligado:
-            janela.title(TITULO_LIGADO)
+            if controle.aba == "Auto Click":
+                janela.title(TITULO_LIGADO)
             status_label.configure(
                 text="● Ativo · " + ("Direito" if config["botao"] == "right" else "Esquerdo"),
                 text_color=COR_VERDE_NEON
             )
         else:
-            janela.title(TITULO_DESLIGADO)
+            if controle.aba == "Auto Click":
+                janela.title(TITULO_DESLIGADO)
             status_label.configure(
                 text="Erro: use F8 para liberar" if erro else TEXTO_STATUS_DESLIGADO,
                 text_color=COR_VERMELHO_STATUS
@@ -165,10 +238,6 @@ def iniciar_aplicacao():
 
     def alternar():
         comandos.put("alternar")
-
-    def alternar_tkinter():
-        clicker.alternar()
-        atualizar_titulo()
 
     def mudar_opcoes(_valor):
         clicker.configurar(BOTOES[combo_botao.get()], MODOS[combo_modo.get()])
@@ -218,22 +287,29 @@ def iniciar_aplicacao():
                 if (ligado and config["modo"] == "pressionar"
                         and comando[1] == config["botao"]):
                     clicker.desligar()
-            elif comando == "alternar":
-                alternar_tkinter()
             else:
-                clicker.desligar()
+                if comando == "alternar" and controle.aba == "LK Drop" and not drop.ligado:
+                    salvar_drop()
+                    try:
+                        drop.intervalo = int(intervalo_drop.get())
+                    except ValueError:
+                        drop.intervalo = 0
+                controle.comando(comando)
         atualizar_titulo()
         janela.after(50, processar_comandos)
 
     def fechar():
         nonlocal fechando
-        if not clicker.parar():
+        if not controle.parar() or not clicker.parar():
             atualizar_titulo()
             return
         fechando = True
         keyboard.unhook_all_hotkeys()
         janela.destroy()
 
+    # Capturas são enfileiradas: nenhum callback do keyboard acessa Tk.
+    keyboard.add_hotkey("F2", lambda: comandos.put("box"))
+    keyboard.add_hotkey("F3", lambda: comandos.put("ground"))
     keyboard.add_hotkey(ATALHO_ALTERNAR, alternar)
     keyboard.add_hotkey(ATALHO_PARAR, lambda: comandos.put("parar"))
     atualizar_titulo()
@@ -245,5 +321,6 @@ def iniciar_aplicacao():
         janela.mainloop()
     finally:
         mouse_fisico.stop()
+        drop.parar()
         clicker.parar()
         keyboard.unhook_all_hotkeys()
