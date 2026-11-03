@@ -99,3 +99,53 @@ A interface usa ícone LK, título curto e status com o botão ativo. F6 alterna
 ### Interromper manualmente o modo pressionado
 
 No Windows, um clique físico no mesmo botão selecionado interrompe apenas o modo **Manter pressionado**, e o status volta a desligado. F6 retoma. O outro botão permanece livre para uso manual. **Cliques repetidos não são alterados por cliques físicos.** O observador ignora eventos marcados pelo Windows como injetados e é removido ao encerrar. Essa integração requer teste manual na máquina Windows; testes automatizados simulam os eventos.
+
+## Aplicativo unificado: Auto Click e LK Drop
+
+As duas abas compartilham **F6** (liga/desliga a função selecionada) e **F8**
+(para tudo). Trocar de aba interrompe a automação anterior e libera suas entradas.
+O aplicativo inicia desligado; somente uma função pode executar por vez.
+O Auto Click mantém o mouse LK, opções e comportamento anterior.
+
+### LK Drop
+
+1. Selecione a aba **LK Drop** e coloque o jogo em primeiro plano.
+2. Posicione o cursor sobre a box no inventário e pressione **F2**.
+3. Posicione o cursor no ponto do chão e pressione **F3**.
+4. Use **F6** no jogo para iniciar; **F8** para parar.
+
+O ciclo move até a box, clica, move até o chão, clica e, opcionalmente,
+pressiona Espaço cinco vezes. O intervalo entre ações inicia em **50 ms**
+(faixa permitida: 20–5000 ms). Cada clique permanece pressionado por **100 ms**;
+Espaço permanece pressionado por **180 ms**, com **180 ms** entre pressões.
+50 ms foi validado pelo usuário no programa separado; a integração precisa de
+novo teste no Windows/MU. Intervalos menores podem falhar no jogo.
+
+F2/F3 funcionam somente com Drop parado e uma janela externa em foco.
+Marcar um ponto em outra janela limpa os pontos anteriores. Os pontos e a janela
+alvo duram apenas a sessão; nunca são salvos. Intervalo e coleta são preferências
+persistidas junto das configurações antigas. A posição é fixa na tela: marque
+novamente se mover a janela ou o inventário. Ao perder o foco do jogo, o Drop
+para e libera as entradas. Volte ao jogo e use F6 para retomar do início do ciclo.
+
+Não há detecção de pilha vazia ou inventário cheio. Quando acabar a pilha, pare,
+coloque outra no mesmo local e retome. As capturas aceitam uma janela externa;
+o aplicativo não identifica automaticamente qual processo é o MU.
+
+### Validação da integração
+
+```powershell
+python -m unittest discover -s tests -v
+python -m compileall -q main.py gui.py drop.py drop_windows.py automation.py config.py
+python -m PyInstaller --clean --noconfirm AutoClick.spec
+```
+
+Os novos módulos Python são incluídos automaticamente pelo PyInstaller; o
+executável continua em `dist/AutoClick.exe`, contendo as duas funções e os assets
+LK existentes. Testes simulados não precisam de Windows e não enviam entradas.
+
+Antes de distribuir, teste no Windows: captura F2/F3 com jogo em foco, ciclo com e
+sem coleta a 50 ms, F6/F8 nas duas abas, troca de aba enquanto mouse/Espaço estão
+pressionados, perda de foco em cada etapa e fechamento durante execução. Confirme
+que o ícone e a arte aparecem no novo executável. Esta integração não publica
+Release nem instala atualização automática.

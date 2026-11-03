@@ -81,3 +81,15 @@ Reorganização aprovada: mouse ampliado aproveitando margens transparentes, Mod
 Correção baseada no print Windows: texto dos seletores centralizado; janela 280x430 para exibir integralmente os blocos F6/F8 sem reduzir o mouse. Descrições do rodapé com fonte 11 e maior margem inferior. Sem alteração funcional.
 
 Pedido aprovado: Modo e Velocidade lado a lado com títulos centralizados acima e campos iguais, acompanhando os blocos F6/F8. Mouse centralizado acima. Janela 380x370 para caber Manter pressionado integralmente e reduzir altura. Motor e atalhos preservados; conferência visual Windows pendente.
+
+Unificação autorizada: LK Drop (nome escolhido por André, substitui LK Box)
+incorporado como segunda aba. F6 alterna a aba selecionada, F8 para ambas,
+F2/F3 marcam box/chão somente em Drop parado com janela externa em foco.
+Troca de aba interrompe/libera antes de iniciar outra função. Drop usa Tk after
+na thread gráfica, backend Windows isolado, gerações/cancelamento e posse explícita
+de entradas para impedir callback antigo de soltar uma execução nova. AutoClicker,
+mouse LK e filtro de entradas injetadas preservados. Configuração mantém extras e
+salva apenas intervalo/coleta Drop; nunca pontos ou HWND. Tempos originais: padrão
+50 ms, faixa 20–5000, mouse 100 ms, Espaço 180 ms e cinco pressões opcionais.
+46 testes simulados passaram; validação real Windows/MU/EXE unificado pendente.
+Sem novas dependências, magia/QWE, atualização, merge ou Release.
