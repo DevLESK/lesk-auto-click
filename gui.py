@@ -7,6 +7,8 @@ import keyboard
 
 from automation import Automations
 from drop import LKDrop
+from combo import LKCombo, validar_combo
+from licensing import pedir_ativacao
 from drop_windows import WindowsInput
 from clicker import AutoClicker
 from mouse_selector import MouseSelector
@@ -55,6 +57,8 @@ def caminho_recurso(nome_arquivo):
 
 
 def iniciar_aplicacao():
+    if not pedir_ativacao():
+        return
     config = carregar_config()
 
     clicker = AutoClicker(config["intervalo_clique"], config["botao"], config["modo"])
@@ -78,10 +82,15 @@ def iniciar_aplicacao():
     abas.pack(fill="both", expand=True, padx=0, pady=0)
     auto_aba = abas.add("Auto Click")
     drop_aba = abas.add("LK Drop")
+    combo_aba = abas.add("LK Combo")
     entrada = WindowsInput()
     drop = LKDrop(janela, entrada, lambda: entrada.raiz(janela.winfo_id()),
                   config["drop_intervalo_ms"], config["drop_recolher"])
-    controle = Automations(clicker, drop)
+    combo = LKCombo(janela, entrada, lambda: entrada.raiz(janela.winfo_id()),
+                    {chave: config[chave] for chave in (
+                        "combo_toque_ms", "combo_intervalo_ms", "combo_apos3_ms",
+                        "combo_recarga_ms", "combo_recarga_ativa")})
+    controle = Automations(clicker, drop, combo)
     abas.configure(command=lambda: controle.selecionar(abas.get()))
 
     conteudo = ctk.CTkFrame(auto_aba, fg_color="transparent")
@@ -195,11 +204,103 @@ def iniciar_aplicacao():
     ctk.CTkLabel(drop_frame, text="F6  Liga / desliga     •     F8  Para tudo",
                  font=("Segoe UI", 14, "bold"), text_color=COR_VERDE_NEON).grid(
                      row=6, column=0, columnspan=2, pady=10)
+    # Terceira aba: valores ajustaveis por 1 ms; sem pressionar o mouse direito.
+    combo_frame = ctk.CTkScrollableFrame(combo_aba, fg_color="transparent")
+    combo_frame.pack(fill="both", expand=True, padx=10, pady=6)
+    combo_frame.grid_columnconfigure(1, weight=1)
+    ctk.CTkLabel(combo_frame, text="LK COMBO · DL / BK", font=FONTE_TITULO,
+                 text_color=COR_VERDE_NEON).grid(
+                     row=0, column=0, columnspan=4, pady=(2, 10))
+
+    campos_combo = {}
+    controles_combo = (
+        ("Toque na tecla (ms)", "combo_toque_ms", 200),
+        ("Entre magias (ms)", "combo_intervalo_ms", 200),
+        ("Apos magia 3 (ms)", "combo_apos3_ms", 100),
+        ("Recarga magia 3 (ms)", "combo_recarga_ms", 15000),
+    )
+    botao_repetir = {"after": None}
+
+    def interromper_repeticao(_evento=None):
+        if botao_repetir["after"] is not None:
+            janela.after_cancel(botao_repetir["after"])
+            botao_repetir["after"] = None
+
+    def passo_combo(chave, limite, delta):
+        if combo.ligado:
+            return
+        try:
+            anterior = int(campos_combo[chave].get())
+        except ValueError:
+            anterior = 0
+        campos_combo[chave].set(str(max(0, min(limite, anterior + delta))))
+
+    def manter_pressionado(chave, limite, delta):
+        interromper_repeticao()
+        def repetir():
+            if combo.ligado:
+                interromper_repeticao()
+                return
+            passo_combo(chave, limite, delta)
+            botao_repetir["after"] = janela.after(35, repetir)
+        botao_repetir["after"] = janela.after(300, repetir)
+
+    for linha, (texto, chave, limite) in enumerate(controles_combo, 1):
+        ctk.CTkLabel(combo_frame, text=texto, anchor="w").grid(
+            row=linha, column=0, sticky="w", padx=4, pady=8)
+        variavel = ctk.StringVar(value=str(config[chave]))
+        campos_combo[chave] = variavel
+        ctk.CTkEntry(combo_frame, textvariable=variavel, width=100,
+                     justify="center").grid(row=linha, column=1, sticky="ew", padx=4)
+        for coluna, sinal, passo in ((2, "-", -1), (3, "+", 1)):
+            botao = ctk.CTkButton(combo_frame, text=sinal, width=35,
+                                  command=lambda c=chave, l=limite, d=passo:
+                                      passo_combo(c, l, d))
+            botao.grid(row=linha, column=coluna, padx=2)
+            botao.bind("<ButtonPress-1>", lambda e, c=chave, l=limite, d=passo:
+                       manter_pressionado(c, l, d), add="+")
+            botao.bind("<ButtonRelease-1>", interromper_repeticao, add="+")
+            botao.bind("<Leave>", interromper_repeticao, add="+")
+
+    recarga_combo = ctk.BooleanVar(value=config["combo_recarga_ativa"])
+    ctk.CTkCheckBox(combo_frame, text="Ativar recarga da magia 3",
+                    variable=recarga_combo).grid(
+                        row=5, column=0, columnspan=4, sticky="w", padx=4, pady=8)
+    status_combo = ctk.CTkLabel(combo_frame, text=combo.status,
+                               wraplength=350, text_color=COR_VERDE_LABEL)
+    status_combo.grid(row=7, column=0, columnspan=4, pady=8)
+    ctk.CTkLabel(combo_frame, text="F6 Liga/desliga · F8 Para tudo\n"
+                 "Segure o botao direito do mouse no MU.",
+                 font=("Segoe UI", 12), text_color=COR_VERDE_NEON).grid(
+                     row=8, column=0, columnspan=4, pady=8)
+
+    def salvar_combo():
+        if combo.ligado:
+            return False
+        try:
+            novos = {chave: int(campos_combo[chave].get())
+                     for _, chave, _ in controles_combo}
+            novos["combo_recarga_ativa"] = bool(recarga_combo.get())
+            validar_combo(novos)
+            combo.configurar(novos)
+        except (ValueError, RuntimeError) as erro:
+            combo.status = "Ajuste invalido: " + str(erro)
+            status_combo.configure(text=combo.status)
+            return False
+        config.update(novos)
+        salvar_config(config)
+        combo.status = "Ajustes salvos. Volte ao MU e pressione F6."
+        status_combo.configure(text=combo.status)
+        return True
+
+    ctk.CTkButton(combo_frame, text="Salvar ajustes",
+                  command=salvar_combo).grid(row=6, column=0, columnspan=4, pady=10)
+    ultimo_combo = None
     ultimo_drop = None
     ultimo_estado = None
 
     def atualizar_titulo():
-        nonlocal ultimo_estado, ultimo_drop
+        nonlocal ultimo_estado, ultimo_drop, ultimo_combo
         estado_drop = (drop.ligado, drop.status, tuple(drop.pontos.items()))
         if estado_drop != ultimo_drop:
             ultimo_drop = estado_drop
@@ -208,9 +309,13 @@ def iniciar_aplicacao():
                 label.configure(text=str(drop.pontos.get(ponto, "Não marcado")))
             campo_intervalo.configure(state="disabled" if drop.ligado else "normal")
             check_recolher.configure(state="disabled" if drop.ligado else "normal")
+        estado_combo = (combo.ligado, combo.status)
+        if estado_combo != ultimo_combo:
+            ultimo_combo = estado_combo
+            status_combo.configure(text=combo.status)
         ligado, erro = clicker.estado()
         estado_visual = (ligado, erro, config["modo"], config["botao"],
-                         controle.aba, estado_drop)
+                         controle.aba, estado_drop, estado_combo)
         if estado_visual == ultimo_estado:
             return
         ultimo_estado = estado_visual
@@ -221,6 +326,8 @@ def iniciar_aplicacao():
         )
         if controle.aba == "LK Drop":
             janela.title("LK Drop · " + ("Ativo" if drop.ligado else "Parado"))
+        elif controle.aba == "LK Combo":
+            janela.title("LK Combo · " + ("Ativo" if combo.ligado else "Parado"))
         if ligado:
             if controle.aba == "Auto Click":
                 janela.title(TITULO_LIGADO)
@@ -294,6 +401,9 @@ def iniciar_aplicacao():
                         drop.intervalo = int(intervalo_drop.get())
                     except ValueError:
                         drop.intervalo = 0
+                if comando == "alternar" and controle.aba == "LK Combo" and not combo.ligado:
+                    if not salvar_combo():
+                        continue
                 controle.comando(comando)
         atualizar_titulo()
         janela.after(50, processar_comandos)
@@ -322,5 +432,6 @@ def iniciar_aplicacao():
     finally:
         mouse_fisico.stop()
         drop.parar()
+        combo.parar()
         clicker.parar()
         keyboard.unhook_all_hotkeys()
