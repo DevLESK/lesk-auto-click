@@ -3,6 +3,7 @@ TEMA_COR = "green"
 
 ARQUIVO_ICONE = "icon.ico"
 ATALHO_ALTERNAR = "F6"
+ATALHO_DIREITO = "F8"
 
 TITULO_LIGADO = "LESK Tools"
 TITULO_DESLIGADO = "LESK Tools"
@@ -10,7 +11,7 @@ TEXTO_TITULO = "LK AUTO CLICK"
 TEXTO_STATUS_LIGADO = "● Ligado"
 TEXTO_STATUS_DESLIGADO = "● Desligado"
 TEXTO_VELOCIDADE = "Velocidade"
-TEXTO_ATALHO = "F6  Liga/desliga   •   F8  Para"
+TEXTO_ATALHO = "F6  Esquerdo   •   F8  Direito   •   F9  Para"
 
 COR_VERDE_NEON = "#45d99a"
 COR_VERDE_LABEL = "#aab5bf"
@@ -43,6 +44,6 @@ INTERVALOS_POR_VELOCIDADE = {
     "Rápida": 0.01,
 }
 
-ATALHO_PARAR = "F8"
+ATALHO_PARAR = "F9"
 BOTOES = {"Esquerdo": "left", "Direito": "right"}
 MODOS = {"Cliques repetidos": "repetir", "Manter pressionado": "pressionar"}

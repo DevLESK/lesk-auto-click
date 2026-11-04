@@ -1,5 +1,15 @@
 # Auto Clicker
 
+> **LESK Tools — Sprint 1 (PR #4):** na aba **Auto Click**, **F6**
+> liga/desliga o esquerdo e **F8** liga/desliga o direito.
+> A troca solta o botao anterior automaticamente. **F9** e a parada geral
+> para todos os modulos. Nas abas **LK Drop** e **LK Combo**, **F6**
+> continua iniciando/parando a funcao selecionada; **F8** nao tem acao.
+> Todas as automacoes param ao trocar de aba. As instrucoes historicas
+> a seguir descrevem etapas anteriores; para este prototipo, prevalecem
+> os atalhos deste aviso.
+
+
 ## Projeto
 
 Auto Clicker desenvolvido em Python para automação de cliques.
@@ -43,7 +53,7 @@ Versão 1.0
 ## Seleção de botão e modo (em validação)
 
 - Clique na metade **Esquerdo** ou **Direito** do desenho do mouse; a seleção fica verde. Depois escolha **Cliques repetidos** ou **Manter pressionado**.
-- Selecionar o desenho não liga a automação. Apenas um botão é automatizado por vez; F6 liga/desliga e F8 para.
+- Selecionar o desenho não liga a automação. Apenas um botão é automatizado por vez; F6 controla esquerdo, F8 controla direito e F9 para.
 - O seletor aceita foco por Tab e seleção pelas setas esquerda/direita.
 - **F6** liga/desliga; **F8** interrompe e libera o botão. Os atalhos disparam ao pressionar a tecla, como na versão original; use toques curtos. A ativação é feita apenas pelos atalhos F6/F8, sem botão na janela.
 - O aplicativo sempre inicia desligado. Posicione o mouse no destino antes de ativar.
@@ -102,8 +112,8 @@ No Windows, um clique físico no mesmo botão selecionado interrompe apenas o mo
 
 ## Aplicativo unificado: Auto Click e LK Drop
 
-As duas abas compartilham **F6** (liga/desliga a função selecionada) e **F8**
-(para tudo). Trocar de aba interrompe a automação anterior e libera suas entradas.
+O Auto Click usa **F6** para esquerdo e **F8** para direito. O Drop usa **F6**
+para ligar/desligar. **F9** para tudo em qualquer aba. Trocar de aba interrompe a automação anterior e libera suas entradas.
 O aplicativo inicia desligado; somente uma função pode executar por vez.
 O Auto Click mantém o mouse LK, opções e comportamento anterior.
 
@@ -112,7 +122,7 @@ O Auto Click mantém o mouse LK, opções e comportamento anterior.
 1. Selecione a aba **LK Drop** e coloque o jogo em primeiro plano.
 2. Posicione o cursor sobre a box no inventário e pressione **F2**.
 3. Posicione o cursor no ponto do chão e pressione **F3**.
-4. Use **F6** no jogo para iniciar; **F8** para parar.
+4. Use **F6** no jogo para iniciar; **F9** para parar.
 
 O ciclo move até a box, clica, move até o chão, clica e, opcionalmente,
 pressiona Espaço cinco vezes. O intervalo entre ações inicia em **50 ms**
@@ -145,7 +155,7 @@ executável continua em `dist/AutoClick.exe`, contendo as duas funções e os as
 LK existentes. Testes simulados não precisam de Windows e não enviam entradas.
 
 Antes de distribuir, teste no Windows: captura F2/F3 com jogo em foco, ciclo com e
-sem coleta a 50 ms, F6/F8 nas duas abas, troca de aba enquanto mouse/Espaço estão
+sem coleta a 50 ms, F6/F9 nas duas abas, troca de aba enquanto mouse/Espaço estão
 pressionados, perda de foco em cada etapa e fechamento durante execução. Confirme
 que o ícone e a arte aparecem no novo executável. Esta integração não publica
 Release nem instala atualização automática.
@@ -156,7 +166,7 @@ Release nem instala atualização automática.
 Branch de integracao: `feat/lesk-tools-combo-licencas`. Este trabalho ainda nao
 esta integrado a `main` e nao deve ser distribuido sem testes no Windows/MU.
 
-- Abas: Auto Click, LK Drop e LK Combo; F6 alterna a aba ativa, F8 para tudo.
+- Abas: Auto Click, LK Drop e LK Combo; F6 alterna Drop/Combo ou controla esquerdo no Auto Click; F8 controla direito no Auto Click; F9 para tudo.
 - Auto Click: preservados modos repetido/pressionado, botao e velocidades.
 - LK Drop: F2 marca a box, F3 marca o chao, coleta com cinco Espacos opcional.
 - LK Combo DL/BK: tecla 1, 2, 3; toque 0–200 ms, intervalo 0–200 ms,
