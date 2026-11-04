@@ -122,6 +122,44 @@ class TestAtalhos(unittest.TestCase):
         controle.selecionar("LK Drop")
         self.assertFalse(clicker.ligado)
 
+    def test_falha_ao_liberar_mouse_impede_mudanca_de_aba(self):
+        controle, clicker, drop, combo = self.montar("pressionar")
+        self.assertTrue(controle.comando("direito"))
+        clicker.liberacao_falha = True
+        self.assertFalse(controle.selecionar("LK Drop"))
+        self.assertEqual(controle.aba, "Auto Click")
+        self.assertTrue(clicker.ligado)
+        self.assertFalse(drop.ligado or combo.ligado)
+        clicker.liberacao_falha = False
+        self.assertTrue(controle.selecionar("LK Drop"))
+        self.assertFalse(clicker.ligado)
+        self.assertEqual(controle.aba, "LK Drop")
+
+    def test_falha_ao_liberar_drop_impede_mudanca_para_combo(self):
+        controle, clicker, drop, combo = self.montar()
+        self.assertTrue(controle.selecionar("LK Drop"))
+        controle.comando("esquerdo")
+        self.assertTrue(drop.ligado)
+        drop.falha = True
+        self.assertFalse(controle.selecionar("LK Combo"))
+        self.assertEqual(controle.aba, "LK Drop")
+        self.assertTrue(drop.ligado)
+        self.assertFalse(clicker.ligado or combo.ligado)
+        drop.falha = False
+        self.assertTrue(controle.selecionar("LK Combo"))
+        self.assertEqual(controle.aba, "LK Combo")
+        self.assertFalse(drop.ligado)
+
+    def test_selecionar_mesma_aba_nao_interrompe_execucao(self):
+        controle, clicker, drop, _ = self.montar()
+        self.assertTrue(controle.selecionar("LK Drop"))
+        controle.comando("esquerdo")
+        self.assertTrue(drop.ligado)
+        antes = drop.paradas
+        self.assertTrue(controle.selecionar("LK Drop"))
+        self.assertTrue(drop.ligado)
+        self.assertEqual(drop.paradas, antes)
+
     def test_falha_ao_soltar_impede_troca(self):
         controle, clicker, _, _ = self.montar()
         controle.comando("esquerdo")
