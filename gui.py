@@ -92,7 +92,13 @@ def iniciar_aplicacao():
                         "combo_toque_ms", "combo_intervalo_ms", "combo_apos3_ms",
                         "combo_recarga_ms", "combo_recarga_ativa")})
     controle = Automations(clicker, drop, combo)
-    abas.configure(command=lambda: controle.selecionar(abas.get()))
+    def selecionar_aba():
+        # A aba visual acompanha a aba de execucao somente apos liberar entradas.
+        if not controle.selecionar(abas.get()):
+            abas.set(controle.aba)
+            atualizar_titulo()
+
+    abas.configure(command=selecionar_aba)
 
     conteudo = ctk.CTkFrame(auto_aba, fg_color="transparent")
     conteudo.pack(fill="both", expand=True, padx=16, pady=8)
