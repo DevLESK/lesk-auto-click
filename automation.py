@@ -17,7 +17,25 @@ class Automations:
         self.parar()
         self.aba = aba
 
+    def _alternar_botao(self, botao):
+        """Atalho dedicado: solta o anterior antes de ligar o novo."""
+        ligado, _erro = self.clicker.estado()
+        if ligado and self.clicker.botao == botao:
+            return self.clicker.desligar()
+        if not self.parar():
+            return False
+        # Modo repetir/pressionar e velocidade configurados no painel nao mudam.
+        self.clicker.configurar(botao, self.clicker.modo)
+        self.clicker.ligar()
+        return True
+
     def comando(self, comando):
+        if comando in ("esquerdo", "direito"):
+            if self.aba == "Auto Click":
+                return self._alternar_botao("left" if comando == "esquerdo" else "right")
+            # F6 continua a alternar a funcao da aba Drop ou Combo.
+            # F8 e dedicado ao direito: fora da aba Auto Click nao faz nada.
+            return self.comando("alternar") if comando == "esquerdo" else False
         if comando == "parar":
             self.parar()
         elif comando == "alternar":
