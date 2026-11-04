@@ -10,7 +10,12 @@ CONFIG_PADRAO = {
     "botao": "left",
     "modo": "repetir",
     "drop_intervalo_ms": 50,
-    "drop_recolher": True
+    "drop_recolher": True,
+    "combo_toque_ms": 5,
+    "combo_intervalo_ms": 5,
+    "combo_apos3_ms": 10,
+    "combo_recarga_ms": 10000,
+    "combo_recarga_ativa": True
 }
 
 
@@ -35,6 +40,16 @@ def completar_config(config):
         config_completa["drop_intervalo_ms"] = 50
     if type(config_completa["drop_recolher"]) is not bool:
         config_completa["drop_recolher"] = True
+    for chave, minimo, maximo in (
+        ("combo_toque_ms", 0, 200),
+        ("combo_intervalo_ms", 0, 200),
+        ("combo_apos3_ms", 0, 100),
+        ("combo_recarga_ms", 0, 15000),
+    ):
+        if type(config_completa[chave]) is not int or not minimo <= config_completa[chave] <= maximo:
+            config_completa[chave] = CONFIG_PADRAO[chave]
+    if type(config_completa["combo_recarga_ativa"]) is not bool:
+        config_completa["combo_recarga_ativa"] = True
     return config_completa
 
 
