@@ -12,6 +12,7 @@ class FakeClicker:
         self.modo = "repetir"
         self.ligado = False
         self.historico = []
+        self.falhar_liberacao = False
 
     def iniciar(self):
         pass
@@ -31,6 +32,8 @@ class FakeClicker:
 
     def desligar(self):
         self.historico.append(("soltar", self.botao))
+        if self.falhar_liberacao:
+            return False
         self.ligado = False
         return True
 
@@ -122,6 +125,15 @@ class TestGui(unittest.TestCase):
                 self.assertEqual(clicker.historico[-3:],
                                  [("soltar", "left"), ("config", "right"),
                                   ("ligar", "right")])
+
+                tabs = ctk.CTkTabview.return_value
+                trocar = tabs.configure.call_args.kwargs["command"]
+                clicker.falhar_liberacao = True
+                tabs.get.return_value = "LK Drop"
+                trocar()
+                self.assertTrue(clicker.ligado)
+                tabs.set.assert_called_with("Auto Click")
+                clicker.falhar_liberacao = False
 
                 hotkeys["F8"]()
                 poll()
