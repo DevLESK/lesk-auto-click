@@ -47,3 +47,18 @@ class WindowsInput:
 
     def espaco_up(self):
         self.u.keybd_event(0x20, 0x39, 2, 0)
+
+    def tecla_down(self, tecla):
+        """Seleciona 1/2/3 no jogo; scan codes PC set 1."""
+        if tecla not in ("1", "2", "3"):
+            raise ValueError("Somente as teclas 1, 2 e 3 sao permitidas.")
+        vk, scan = {"1": (0x31, 0x02), "2": (0x32, 0x03),
+                    "3": (0x33, 0x04)}[tecla]
+        self.u.keybd_event(vk, scan, 0, 0)
+
+    def tecla_up(self, tecla):
+        if tecla not in ("1", "2", "3"):
+            raise ValueError("Somente as teclas 1, 2 e 3 sao permitidas.")
+        vk, scan = {"1": (0x31, 0x02), "2": (0x32, 0x03),
+                    "3": (0x33, 0x04)}[tecla]
+        self.u.keybd_event(vk, scan, 2, 0)
