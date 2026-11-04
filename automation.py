@@ -37,7 +37,7 @@ class Automations:
             # F8 e dedicado ao direito: fora da aba Auto Click nao faz nada.
             return self.comando("alternar") if comando == "esquerdo" else False
         if comando == "parar":
-            self.parar()
+            return self.parar()
         elif comando == "alternar":
             if self.aba == "LK Combo" and self.combo is not None:
                 if self.combo.ligado:
