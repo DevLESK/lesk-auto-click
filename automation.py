@@ -14,8 +14,13 @@ class Automations:
         return auto_ok and drop_ok and combo_ok
 
     def selecionar(self, aba):
-        self.parar()
+        """Nao muda aba se algum motor nao conseguir liberar as entradas."""
+        if aba == self.aba:
+            return True
+        if not self.parar():
+            return False
         self.aba = aba
+        return True
 
     def _alternar_botao(self, botao):
         """Atalho dedicado: solta o anterior antes de ligar o novo."""
