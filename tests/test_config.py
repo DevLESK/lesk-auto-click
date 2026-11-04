@@ -69,7 +69,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(self.ler_config_json(), config.CONFIG_PADRAO | dados)
 
     def test_migra_config_antiga(self):
-        self.config_path.write_text('{"velocidade": "Rápida", "intervalo_clique": 0.01}')
+        self.config_path.write_text('{"velocidade": "Rápida", "intervalo_clique": 0.01}', encoding="utf-8")
         resultado = config.carregar_config()
         self.assertEqual(resultado["botao"], "left")
         self.assertEqual(resultado["modo"], "repetir")
