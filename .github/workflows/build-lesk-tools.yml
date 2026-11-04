@@ -2,10 +2,10 @@ name: LESK Tools - Testes e Windows EXE
 
 on:
   push:
-    branches: [feat/lesk-tools-combo-licencas]
+    branches: [feat/lesk-tools-combo-licencas, feat/autoclick-f6-f8-f9]
   workflow_dispatch:
   pull_request:
-    branches: [main]
+    branches: [main, feat/lesk-tools-combo-licencas]
 
 jobs:
   windows-build:
