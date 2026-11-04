@@ -89,7 +89,7 @@ class LKCombo:
                     acao()
             except Exception as erro:
                 self.parar(f"Erro no combo: {erro}")
-        identificador = self.scheduler.after(max(0, int(espera_ms)), callback)
+        identificador = self.scheduler.after(max(1, int(espera_ms)), callback)
         self.pendentes.add(identificador)
 
     def _pressionar(self, tecla, geracao):
