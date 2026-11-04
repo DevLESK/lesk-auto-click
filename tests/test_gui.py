@@ -10,6 +10,7 @@ class TestGui(unittest.TestCase):
         ctk, keyboard, clicker = Mock(), Mock(), Mock()
         clicker.estado.return_value = (False, None)
         clicker.parar.return_value = True
+        clicker.desligar.return_value = True
         clicker.botao, clicker.modo = "right", "pressionar"
         combos = [Mock(), Mock(), Mock()]
         seletor_module = Mock()
@@ -18,7 +19,8 @@ class TestGui(unittest.TestCase):
         ctk.CTkComboBox.side_effect = combos[1:]
         janela = ctk.CTk.return_value
         config = {"intervalo_clique": 0.05, "velocidade": "Média",
-                  "botao": "left", "modo": "repetir"}
+                  "botao": "left", "modo": "repetir",
+                  "drop_intervalo_ms": 50, "drop_recolher": True}
         config_module, clicker_module = Mock(), Mock()
         config_module.carregar_config.return_value = config
         clicker_module.AutoClicker.return_value = clicker
@@ -27,8 +29,14 @@ class TestGui(unittest.TestCase):
         with patch.dict(sys.modules, {"customtkinter": ctk, "keyboard": keyboard,
                                      "clicker": clicker_module, "config": config_module,
                                      "mouse_selector": seletor_module,
-                                     "physical_mouse": physical_module}):
+                                     "physical_mouse": physical_module, "drop_windows": Mock()}):
             spec.loader.exec_module(gui)
+            io = gui.WindowsInput.return_value
+            io.foco.return_value = 100
+            io.raiz.return_value = 200
+            io.posicao.return_value = (10, 20)
+            ctk.StringVar.return_value.get.return_value = "50"
+            ctk.BooleanVar.return_value.get.return_value = True
             def executar_interface():
                 hotkeys = {c.args[0]: c.args[1] for c in keyboard.add_hotkey.call_args_list}
                 poll = janela.after.call_args.args[1]
@@ -38,7 +46,7 @@ class TestGui(unittest.TestCase):
                     poll()
                 self.assertEqual(combos[0].configure.call_count, contagem)
                 # O F6 mantém o comportamento da versão original (pressionamento).
-                self.assertNotIn("trigger_on_release", keyboard.add_hotkey.call_args_list[0].kwargs)
+                self.assertNotIn("trigger_on_release", next(c for c in keyboard.add_hotkey.call_args_list if c.args[0] == "F6").kwargs)
                 hotkeys["F6"]()
                 clicker.alternar.assert_not_called()
                 poll()
@@ -49,7 +57,7 @@ class TestGui(unittest.TestCase):
                 self.assertEqual(clicker.alternar.call_count, 2)
                 hotkeys["F8"]()
                 poll()
-                clicker.desligar.assert_called_once()
+                self.assertEqual(clicker.desligar.call_count, 1)
                 combos[0].get.return_value = "Direito"
                 combos[1].get.return_value = "Manter pressionado"
                 mudar = next(c.kwargs["command"] for c in combos[0].configure.call_args_list if "command" in c.kwargs)
@@ -85,6 +93,24 @@ class TestGui(unittest.TestCase):
                 fisico("left")
                 poll()
                 self.assertEqual(clicker.desligar.call_count, antes + 1)
+                # Integração das abas com o motor Drop real e IO simulado.
+                tabs = ctk.CTkTabview.return_value
+                trocar = tabs.configure.call_args.kwargs["command"]
+                tabs.get.return_value = "LK Drop"
+                trocar()
+                poll()
+                self.assertEqual(janela.title.call_args.args[0], "LK Drop · Parado")
+                for key in ("F2", "F3", "F6"):
+                    hotkeys[key]()
+                    poll()
+                io.mover.assert_called_with(10, 20)
+                self.assertEqual(janela.title.call_args.args[0], "LK Drop · Ativo")
+                hotkeys["F8"]()
+                poll()
+                self.assertEqual(janela.title.call_args.args[0], "LK Drop · Parado")
+                tabs.get.return_value = "Auto Click"
+                trocar()
+                self.assertEqual(len(keyboard.add_hotkey.call_args_list), 4)
                 fechar = janela.protocol.call_args.args[1]
                 fechar()
                 janela.destroy.assert_called_once()

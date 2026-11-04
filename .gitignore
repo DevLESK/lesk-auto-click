@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Licencas e chaves de emissao - NUNCA versionar dados privados
+*.lesk
+*private*.pem
+lesk_private_key.pem

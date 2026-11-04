@@ -69,7 +69,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(self.ler_config_json(), config.CONFIG_PADRAO | dados)
 
     def test_migra_config_antiga(self):
-        self.config_path.write_text('{"velocidade": "Rápida", "intervalo_clique": 0.01}')
+        self.config_path.write_text('{"velocidade": "Rápida", "intervalo_clique": 0.01}', encoding="utf-8")
         resultado = config.carregar_config()
         self.assertEqual(resultado["botao"], "left")
         self.assertEqual(resultado["modo"], "repetir")
@@ -84,6 +84,23 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(resultado["botao"], "left")
             self.assertEqual(resultado["modo"], "repetir")
             self.assertEqual(resultado["intervalo_clique"], 0.05)
+
+    def test_drop_migra_valida_e_preserva_extras(self):
+        for dados in ({"tema": "LK"},
+                      {"drop_intervalo_ms": False, "drop_recolher": "sim", "tema": "LK"},
+                      {"drop_intervalo_ms": 19, "drop_recolher": None, "tema": "LK"},
+                      {"drop_intervalo_ms": 5001, "tema": "LK"}):
+            self.config_path.write_text(json.dumps(dados))
+            resultado = config.carregar_config()
+            self.assertEqual(resultado["drop_intervalo_ms"], 50)
+            self.assertIs(resultado["drop_recolher"], True)
+            self.assertEqual(resultado["tema"], "LK")
+            self.assertEqual(self.ler_config_json(), resultado)
+        dados = {"drop_intervalo_ms": 75, "drop_recolher": False, "botao": "right"}
+        self.config_path.write_text(json.dumps(dados))
+        self.assertEqual(config.carregar_config(), config.CONFIG_PADRAO | dados)
+        self.assertNotIn("alvo", self.ler_config_json())
+        self.assertNotIn("pontos", self.ler_config_json())
 
     def test_preserva_chaves_extras(self):
         dados = {

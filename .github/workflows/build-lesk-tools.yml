@@ -1,0 +1,29 @@
+name: LESK Tools - Testes e Windows EXE
+
+on:
+  push:
+    branches: [feat/lesk-tools-combo-licencas]
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements.txt
+      - name: Testar motores simulados
+        run: python -m unittest discover -s tests -v
+      - name: Compilar executavel
+        run: python -m PyInstaller --clean --noconfirm AutoClick.spec
+      - name: Publicar arquivo para testes (nao e Release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: LESK-Tools-Windows-prototipo
+          path: dist/AutoClick.exe
+          retention-days: 14
