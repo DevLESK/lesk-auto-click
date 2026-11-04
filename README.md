@@ -149,3 +149,59 @@ sem coleta a 50 ms, F6/F8 nas duas abas, troca de aba enquanto mouse/Espaço est
 pressionados, perda de foco em cada etapa e fechamento durante execução. Confirme
 que o ícone e a arte aparecem no novo executável. Esta integração não publica
 Release nem instala atualização automática.
+
+
+## LESK Tools — Auto Click + LK Drop + LK Combo (piloto da guild)
+
+Branch de integracao: `feat/lesk-tools-combo-licencas`. Este trabalho ainda nao
+esta integrado a `main` e nao deve ser distribuido sem testes no Windows/MU.
+
+- Abas: Auto Click, LK Drop e LK Combo; F6 alterna a aba ativa, F8 para tudo.
+- Auto Click: preservados modos repetido/pressionado, botao e velocidades.
+- LK Drop: F2 marca a box, F3 marca o chao, coleta com cinco Espacos opcional.
+- LK Combo DL/BK: tecla 1, 2, 3; toque 0–200 ms, intervalo 0–200 ms,
+  espera apos magia 3 de 0–100 ms e recarga opcional de 0–15000 ms.
+  Sem recarga: 1-2-3 continuo. Com recarga: 1-2-3-1, espera o saldo
+  de recarga contado do fim da magia 3, e reinicia em 2-3-1.
+  O clique direito permanece **manual**, como na versao separada.
+- So uma automacao roda de cada vez. Sair da janela alvo interrompe
+  o Drop/Combo. Selecionar outra aba para qualquer automacao em execucao.
+- Apos configurar o Combo, use "Salvar ajustes", volte ao jogo e pressione F6.
+
+### Licencas offline para a guild
+
+O aplicativo valida uma licenca `.lesk` assinada com Ed25519 e vinculada
+ao codigo resumido do computador. Sem uma licenca valida, a interface de
+automacao nao e iniciada. O codigo exibido nao contem o MachineGuid bruto.
+
+1. Usuario abre o EXE, clica em "Copiar codigo do PC" e manda ao admin.
+2. Admin executa `gerar_licenca.py` com sua chave PRIVADA guardada fora do GitHub.
+3. Admin envia apenas `licenca.lesk` ao usuario.
+4. Usuario clica em "Importar arquivo de licenca" e escolhe o `.lesk`.
+5. Licenca e salva em `%APPDATA%/LESKTools/license.lesk`.
+
+A chave privada NAO e fornecida pelo repositório. A chave publica ja esta
+embutida em `licensing.py`; licencas so podem ser geradas com a correspondente
+chave privada do proprietario. Nunca inclua essa chave no EXE, em commits,
+prints ou arquivos enviados a jogadores.
+
+Limites: o sistema **nao possui servidor**, portanto revogacao imediata
+remota nao existe; a vigencia opcional controla expiracao. Mudancas de
+instalacao do Windows podem exigir nova emissao. Software desktop pode
+ser modificado por engenharia reversa: nao existe protecao absoluta.
+
+### Validacao e compilacao
+
+No Windows, em ambiente de desenvolvimento:
+```powershell
+py -3 -m pip install -r requirements.txt
+py -3 -m unittest discover -s tests -v
+py -3 -m PyInstaller --clean --noconfirm AutoClick.spec
+```
+
+A branch possui fluxo GitHub Actions de build em Windows para testes, com
+arquivo `LESK-Tools-Windows-prototipo` apos sucesso. O EXE nao foi
+testado no cliente do MU por esse fluxo. Antes de entregar aos jogadores,
+testar liberacao F8 com cada motor, as 3 teclas em diferentes servidores,
+janela sem foco, 0 ms, ativacao, expiracao e reinstalacao. Respeitar as
+regras de automacao de cada servidor de MU.
