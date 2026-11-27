@@ -24,10 +24,11 @@ def validar_combo(config):
 
 
 class LKCombo:
-    def __init__(self, scheduler, entrada, janela_propria, config):
+    def __init__(self, scheduler, entrada, janela_propria, config, diagnostico=None):
         self.scheduler, self.entrada = scheduler, entrada
         self.janela_propria = janela_propria
         self.config = dict(config)
+        self.diagnostico = diagnostico  # None: caminho existente, sem medição
         self.ligado = False
         self.geracao = 0
         self.pendentes = set()
@@ -36,6 +37,14 @@ class LKCombo:
         self.terceira_liberada_em = 0.0
         self.ciclos = 0
         self.status = "Configure os tempos e pressione F6 no jogo."
+
+    def _registrar(self, evento, tecla="", espera_ms=None, atraso_ms=None):
+        if self.diagnostico is not None:
+            try:
+                self.diagnostico.registrar(evento, tecla, espera_ms, atraso_ms)
+            except Exception:
+                # Telemetria nunca interrompe entradas, parada ou liberação.
+                pass
 
     def configurar(self, config):
         if self.ligado:
@@ -57,6 +66,7 @@ class LKCombo:
                 self.status = f"Erro ao liberar tecla {tecla}: {erro}. Use F8."
                 return False
             self.pressionada = None
+            self._registrar("tecla_up_parada", tecla)
         self.status = mensagem
         return True
 
@@ -78,10 +88,25 @@ class LKCombo:
             return False
 
     def _agendar(self, espera_ms, acao, geracao):
+        espera_efetiva = max(1, int(espera_ms))
+        prazo_ns = None
+        if self.diagnostico is not None:
+            try:
+                prazo_ns = self.diagnostico.relogio_ns() + espera_efetiva * 1000000
+            except Exception:
+                prazo_ns = None
+            self._registrar("agendar", espera_ms=espera_efetiva)
+
         def callback():
             self.pendentes.discard(identificador)
             if not self.ligado or self.geracao != geracao:
                 return
+            if prazo_ns is not None:
+                try:
+                    desvio = max(0.0, (self.diagnostico.relogio_ns() - prazo_ns) / 1000000)
+                    self._registrar("callback", atraso_ms=round(desvio, 3))
+                except Exception:
+                    pass
             try:
                 if self.entrada.foco() != self.alvo:
                     self.parar("Pausado: saiu da janela do jogo.")
@@ -89,7 +114,7 @@ class LKCombo:
                     acao()
             except Exception as erro:
                 self.parar(f"Erro no combo: {erro}")
-        identificador = self.scheduler.after(max(1, int(espera_ms)), callback)
+        identificador = self.scheduler.after(espera_efetiva, callback)
         self.pendentes.add(identificador)
 
     def _pressionar(self, tecla, geracao):
@@ -97,11 +122,13 @@ class LKCombo:
             return
         self.pressionada = tecla  # registra antes da entrada: pode falhar apos pressionar
         self.entrada.tecla_down(tecla)
+        self._registrar("tecla_down", tecla)
         self._agendar(self.config["combo_toque_ms"],
                       lambda: self._soltar(tecla, geracao), geracao)
 
     def _soltar(self, tecla, geracao):
         self.entrada.tecla_up(tecla)
+        self._registrar("tecla_up", tecla)
         self.pressionada = None
         if tecla == "1" and self.config["combo_recarga_ativa"] and self.ciclos:
             restante = self.config["combo_recarga_ms"] - int(
