@@ -16,21 +16,21 @@ class ColetaComboHomologacao:
         self.perfil = None
 
     def ativar(self):
-        if self.combo.ligado:
-            raise RuntimeError("Pare o Combo DL antes de iniciar a coleta.")
+        if self.combo.ligado or self.combo.pressionada is not None:
+            raise RuntimeError("Pare e libere as teclas antes de iniciar a coleta.")
         self.coletor = self.fabrica()
         self.perfil = dict(self.combo.config)
         self.combo.diagnostico = self.coletor
         return self.coletor
 
     def desativar(self):
-        if self.combo.ligado:
-            raise RuntimeError("Pare o Combo DL antes de desativar a coleta.")
+        if self.combo.ligado or self.combo.pressionada is not None:
+            raise RuntimeError("Pare e libere as teclas antes de desativar a coleta.")
         self.combo.diagnostico = None
 
     def exportar(self, destino):
-        if self.combo.ligado:
-            raise RuntimeError("Pare o Combo DL antes de exportar.")
+        if self.combo.ligado or self.combo.pressionada is not None:
+            raise RuntimeError("Pare e libere as teclas antes de exportar.")
         if not self.coletor or not self.coletor.eventos:
             raise ValueError("Nenhum evento coletado. Ative a coleta e teste o combo.")
         if self.combo.diagnostico is not None:
