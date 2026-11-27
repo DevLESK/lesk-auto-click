@@ -8,6 +8,7 @@ import keyboard
 from automation import Automations
 from drop import LKDrop
 from combo import LKCombo, validar_combo
+from combo_homologacao import ColetaComboHomologacao
 from licensing import pedir_ativacao
 from drop_windows import WindowsInput
 from clicker import AutoClicker
@@ -17,6 +18,7 @@ from config import carregar_config, salvar_config
 from ui_constants import (
     ARQUIVO_ICONE,
     ATALHO_PARAR,
+    ATALHO_DIREITO,
     BOTOES,
     MODOS,
     ATALHO_ALTERNAR,
@@ -91,7 +93,13 @@ def iniciar_aplicacao():
                         "combo_toque_ms", "combo_intervalo_ms", "combo_apos3_ms",
                         "combo_recarga_ms", "combo_recarga_ativa")})
     controle = Automations(clicker, drop, combo)
-    abas.configure(command=lambda: controle.selecionar(abas.get()))
+    def selecionar_aba():
+        # A aba visual acompanha a aba de execucao somente apos liberar entradas.
+        if not controle.selecionar(abas.get()):
+            abas.set(controle.aba)
+            atualizar_titulo()
+
+    abas.configure(command=selecionar_aba)
 
     conteudo = ctk.CTkFrame(auto_aba, fg_color="transparent")
     conteudo.pack(fill="both", expand=True, padx=16, pady=8)
@@ -201,7 +209,7 @@ def iniciar_aplicacao():
     status_drop = ctk.CTkLabel(drop_frame, text=drop.status, wraplength=320,
                               text_color=COR_VERDE_LABEL, height=50)
     status_drop.grid(row=5, column=0, columnspan=2, pady=8)
-    ctk.CTkLabel(drop_frame, text="F6  Liga / desliga     •     F8  Para tudo",
+    ctk.CTkLabel(drop_frame, text="F6  Liga / desliga     •     F9  Para tudo",
                  font=("Segoe UI", 14, "bold"), text_color=COR_VERDE_NEON).grid(
                      row=6, column=0, columnspan=2, pady=10)
     # Terceira aba: valores ajustaveis por 1 ms; sem pressionar o mouse direito.
@@ -269,7 +277,7 @@ def iniciar_aplicacao():
     status_combo = ctk.CTkLabel(combo_frame, text=combo.status,
                                wraplength=350, text_color=COR_VERDE_LABEL)
     status_combo.grid(row=7, column=0, columnspan=4, pady=8)
-    ctk.CTkLabel(combo_frame, text="F6 Liga/desliga · F8 Para tudo\n"
+    ctk.CTkLabel(combo_frame, text="F6 Liga/desliga · F9 Para tudo\n"
                  "Segure o botao direito do mouse no MU.",
                  font=("Segoe UI", 12), text_color=COR_VERDE_NEON).grid(
                      row=8, column=0, columnspan=4, pady=8)
@@ -282,6 +290,9 @@ def iniciar_aplicacao():
                      for _, chave, _ in controles_combo}
             novos["combo_recarga_ativa"] = bool(recarga_combo.get())
             validar_combo(novos)
+            if (os.environ.get("LESK_TOOLS_DIAGNOSTICO") == "1"
+                    and combo.diagnostico is not None and novos != combo.config):
+                raise RuntimeError("Desative a coleta antes de alterar o perfil.")
             combo.configurar(novos)
         except (ValueError, RuntimeError) as erro:
             combo.status = "Ajuste invalido: " + str(erro)
@@ -295,6 +306,62 @@ def iniciar_aplicacao():
 
     ctk.CTkButton(combo_frame, text="Salvar ajustes",
                   command=salvar_combo).grid(row=6, column=0, columnspan=4, pady=10)
+
+    # Controle temporário: só disponível com autorização explícita no ambiente.
+    # Não adiciona hotkeys, não modifica tempos e não grava durante o ciclo.
+    if os.environ.get("LESK_TOOLS_DIAGNOSTICO") == "1":
+        coleta = ColetaComboHomologacao(combo)
+        estado_coleta = ctk.CTkLabel(
+            combo_frame, text="Diagnóstico desligado (homologação).",
+            wraplength=350, text_color=COR_VERDE_LABEL)
+        estado_coleta.grid(row=9, column=0, columnspan=4, pady=4)
+
+        def alternar_coleta():
+            try:
+                if combo.diagnostico is None:
+                    if not salvar_combo():
+                        return
+                    coleta.ativar()
+                    estado_coleta.configure(text="Coleta ligada. Teste no MU e pare com F9.")
+                else:
+                    coleta.desativar()
+                    estado_coleta.configure(text="Coleta desligada. Pode exportar o CSV.")
+            except (ValueError, RuntimeError) as erro:
+                estado_coleta.configure(text=str(erro))
+
+        def exportar_coleta():
+            # Nunca abrir diálogo nem escrever arquivo durante o Combo.
+            if combo.ligado:
+                estado_coleta.configure(text="Pare o combo com F9 antes de exportar.")
+                return
+            if combo.diagnostico is not None:
+                estado_coleta.configure(text="Desative a coleta antes de exportar.")
+                return
+            if coleta.coletor is None or not coleta.coletor.eventos:
+                estado_coleta.configure(text="Nenhum evento de diagnóstico disponível.")
+                return
+            from tkinter import filedialog
+            destino = filedialog.asksaveasfilename(
+                parent=janela, title="Salvar diagnóstico do Combo DL",
+                defaultextension=".csv",
+                filetypes=[("CSV", "*.csv")])
+            if not destino:
+                return
+            try:
+                csv, perfil = coleta.exportar(destino)
+                estado_coleta.configure(
+                    text="Coleta salva: " + csv.name + " / " + perfil.name)
+            except (OSError, ValueError, RuntimeError, KeyError) as erro:
+                estado_coleta.configure(text="Falha na exportação: " + str(erro))
+
+        ctk.CTkButton(
+            combo_frame, text="Ligar / desligar coleta (homologação)",
+            command=alternar_coleta
+        ).grid(row=10, column=0, columnspan=4, pady=3)
+        ctk.CTkButton(
+            combo_frame, text="Exportar CSV após F9",
+            command=exportar_coleta
+        ).grid(row=11, column=0, columnspan=4, pady=3)
     ultimo_combo = None
     ultimo_drop = None
     ultimo_estado = None
@@ -339,12 +406,12 @@ def iniciar_aplicacao():
             if controle.aba == "Auto Click":
                 janela.title(TITULO_DESLIGADO)
             status_label.configure(
-                text="Erro: use F8 para liberar" if erro else TEXTO_STATUS_DESLIGADO,
+                text="Erro: use F9 para liberar" if erro else TEXTO_STATUS_DESLIGADO,
                 text_color=COR_VERMELHO_STATUS
             )
 
     def alternar():
-        comandos.put("alternar")
+        comandos.put("esquerdo")
 
     def mudar_opcoes(_valor):
         clicker.configurar(BOTOES[combo_botao.get()], MODOS[combo_modo.get()])
@@ -368,15 +435,16 @@ def iniciar_aplicacao():
 
     atalhos = ctk.CTkFrame(conteudo, fg_color="transparent")
     atalhos.grid(row=5, column=0, columnspan=2, sticky="ew", pady=(10, 0))
-    atalhos.grid_columnconfigure((0, 1), weight=1, uniform="atalhos")
+    atalhos.grid_columnconfigure((0, 1, 2), weight=1, uniform="atalhos")
     for coluna, tecla, descricao, cor, fundo in (
-        (0, "F6", "Liga / desliga", "#45d99a", "#203c32"),
-        (1, "F8", "Parar", "#ff8282", "#3d292d"),
+        (0, "F6", "Esquerdo", "#45d99a", "#203c32"),
+        (1, "F8", "Direito", "#45d99a", "#203c32"),
+        (2, "F9", "Parar tudo", "#ff8282", "#3d292d"),
     ):
         bloco = ctk.CTkFrame(atalhos, fg_color=fundo, border_color=cor,
                              border_width=1, corner_radius=8)
         bloco.grid(row=0, column=coluna, sticky="ew",
-                   padx=(0, 4) if coluna == 0 else (4, 0))
+                   padx=4)
         ctk.CTkLabel(bloco, text=tecla, height=20, text_color=cor,
                      font=("Segoe UI", 15, "bold")).pack(pady=(3, 0))
         ctk.CTkLabel(bloco, text=descricao, height=18,
@@ -395,16 +463,23 @@ def iniciar_aplicacao():
                         and comando[1] == config["botao"]):
                     clicker.desligar()
             else:
-                if comando == "alternar" and controle.aba == "LK Drop" and not drop.ligado:
+                if comando == "esquerdo" and controle.aba == "LK Drop" and not drop.ligado:
                     salvar_drop()
                     try:
                         drop.intervalo = int(intervalo_drop.get())
                     except ValueError:
                         drop.intervalo = 0
-                if comando == "alternar" and controle.aba == "LK Combo" and not combo.ligado:
+                if comando == "esquerdo" and controle.aba == "LK Combo" and not combo.ligado:
                     if not salvar_combo():
                         continue
-                controle.comando(comando)
+                resultado = controle.comando(comando)
+                if (resultado and comando in ("esquerdo", "direito")
+                        and controle.aba == "Auto Click"):
+                    # Atalho escolhe botao sem passar pelo seletor visual desabilitado.
+                    if config["botao"] != clicker.botao:
+                        config["botao"] = clicker.botao
+                        combo_botao.set("Esquerdo" if clicker.botao == "left" else "Direito")
+                        salvar_config(config)
         atualizar_titulo()
         janela.after(50, processar_comandos)
 
@@ -421,6 +496,7 @@ def iniciar_aplicacao():
     keyboard.add_hotkey("F2", lambda: comandos.put("box"))
     keyboard.add_hotkey("F3", lambda: comandos.put("ground"))
     keyboard.add_hotkey(ATALHO_ALTERNAR, alternar)
+    keyboard.add_hotkey(ATALHO_DIREITO, lambda: comandos.put("direito"))
     keyboard.add_hotkey(ATALHO_PARAR, lambda: comandos.put("parar"))
     atualizar_titulo()
     janela.after(50, processar_comandos)
