@@ -290,7 +290,8 @@ def iniciar_aplicacao():
                      for _, chave, _ in controles_combo}
             novos["combo_recarga_ativa"] = bool(recarga_combo.get())
             validar_combo(novos)
-            if combo.diagnostico is not None and novos != combo.config:
+            if (os.environ.get("LESK_TOOLS_DIAGNOSTICO") == "1"
+                    and combo.diagnostico is not None and novos != combo.config):
                 raise RuntimeError("Desative a coleta antes de alterar o perfil.")
             combo.configurar(novos)
         except (ValueError, RuntimeError) as erro:
