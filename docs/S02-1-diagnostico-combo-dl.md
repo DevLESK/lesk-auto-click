@@ -30,3 +30,5 @@ O coletor guarda até 20.000 eventos por padrão e descarta os mais antigos ao e
 `python -m unittest discover -s tests -v`
 
 Os testes simulam agendamentos e atrasos; não medem desempenho real do Tk/Windows. A CI empacota um EXE experimental por configuração histórica do workflow; **não distribuir**.
+
+**Atenção:** como esta branch está empilhada sobre o PR #5, revisar apenas os commits da S02.1; não mesclar o PR de diagnóstico antes da reconciliação dos PRs existentes.
