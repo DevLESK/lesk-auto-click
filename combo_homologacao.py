@@ -13,11 +13,13 @@ class ColetaComboHomologacao:
         self.combo = combo
         self.fabrica = fabrica
         self.coletor = None
+        self.perfil = None
 
     def ativar(self):
         if self.combo.ligado:
             raise RuntimeError("Pare o Combo DL antes de iniciar a coleta.")
         self.coletor = self.fabrica()
+        self.perfil = dict(self.combo.config)
         self.combo.diagnostico = self.coletor
         return self.coletor
 
@@ -26,7 +28,7 @@ class ColetaComboHomologacao:
             raise RuntimeError("Pare o Combo DL antes de desativar a coleta.")
         self.combo.diagnostico = None
 
-    def exportar(self, destino, configuracao):
+    def exportar(self, destino):
         if self.combo.ligado:
             raise RuntimeError("Pare o Combo DL antes de exportar.")
         if not self.coletor or not self.coletor.eventos:
@@ -42,7 +44,7 @@ class ColetaComboHomologacao:
             "combo_toque_ms", "combo_intervalo_ms",
             "combo_apos3_ms", "combo_recarga_ms", "combo_recarga_ativa",
         )
-        valores = {chave: configuracao[chave] for chave in chaves}
+        valores = {chave: self.perfil[chave] for chave in chaves}
         # Gerar o arquivo de eventos e um arquivo de perfil no mesmo diretório.
         self.coletor.exportar_csv(arquivo)
         perfil = arquivo.with_suffix(".perfil.txt")
