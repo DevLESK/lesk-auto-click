@@ -290,6 +290,8 @@ def iniciar_aplicacao():
                      for _, chave, _ in controles_combo}
             novos["combo_recarga_ativa"] = bool(recarga_combo.get())
             validar_combo(novos)
+            if combo.diagnostico is not None and novos != combo.config:
+                raise RuntimeError("Desative a coleta antes de alterar o perfil.")
             combo.configurar(novos)
         except (ValueError, RuntimeError) as erro:
             combo.status = "Ajuste invalido: " + str(erro)
@@ -316,6 +318,8 @@ def iniciar_aplicacao():
         def alternar_coleta():
             try:
                 if combo.diagnostico is None:
+                    if not salvar_combo():
+                        return
                     coleta.ativar()
                     estado_coleta.configure(text="Coleta ligada. Teste no MU e pare com F9.")
                 else:
