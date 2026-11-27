@@ -8,6 +8,7 @@ import keyboard
 from automation import Automations
 from drop import LKDrop
 from combo import LKCombo, validar_combo
+from combo_homologacao import ColetaComboHomologacao
 from licensing import pedir_ativacao
 from drop_windows import WindowsInput
 from clicker import AutoClicker
@@ -302,6 +303,60 @@ def iniciar_aplicacao():
 
     ctk.CTkButton(combo_frame, text="Salvar ajustes",
                   command=salvar_combo).grid(row=6, column=0, columnspan=4, pady=10)
+
+    # Controle temporário: só disponível com autorização explícita no ambiente.
+    # Não adiciona hotkeys, não modifica tempos e não grava durante o ciclo.
+    if os.environ.get("LESK_TOOLS_DIAGNOSTICO") == "1":
+        coleta = ColetaComboHomologacao(combo)
+        estado_coleta = ctk.CTkLabel(
+            combo_frame, text="Diagnóstico desligado (homologação).",
+            wraplength=350, text_color=COR_VERDE_LABEL)
+        estado_coleta.grid(row=9, column=0, columnspan=4, pady=4)
+
+        def alternar_coleta():
+            try:
+                if combo.diagnostico is None:
+                    coleta.ativar()
+                    estado_coleta.configure(text="Coleta ligada. Teste no MU e pare com F9.")
+                else:
+                    coleta.desativar()
+                    estado_coleta.configure(text="Coleta desligada. Pode exportar o CSV.")
+            except (ValueError, RuntimeError) as erro:
+                estado_coleta.configure(text=str(erro))
+
+        def exportar_coleta():
+            # Nunca abrir diálogo nem escrever arquivo durante o Combo.
+            if combo.ligado:
+                estado_coleta.configure(text="Pare o combo com F9 antes de exportar.")
+                return
+            if combo.diagnostico is not None:
+                estado_coleta.configure(text="Desative a coleta antes de exportar.")
+                return
+            if coleta.coletor is None or not coleta.coletor.eventos:
+                estado_coleta.configure(text="Nenhum evento de diagnóstico disponível.")
+                return
+            from tkinter import filedialog
+            destino = filedialog.asksaveasfilename(
+                parent=janela, title="Salvar diagnóstico do Combo DL",
+                defaultextension=".csv",
+                filetypes=[("CSV", "*.csv")])
+            if not destino:
+                return
+            try:
+                csv, perfil = coleta.exportar(destino)
+                estado_coleta.configure(
+                    text="Coleta salva: " + csv.name + " / " + perfil.name)
+            except (OSError, ValueError, RuntimeError, KeyError) as erro:
+                estado_coleta.configure(text="Falha na exportação: " + str(erro))
+
+        ctk.CTkButton(
+            combo_frame, text="Ligar / desligar coleta (homologação)",
+            command=alternar_coleta
+        ).grid(row=10, column=0, columnspan=4, pady=3)
+        ctk.CTkButton(
+            combo_frame, text="Exportar CSV após F9",
+            command=exportar_coleta
+        ).grid(row=11, column=0, columnspan=4, pady=3)
     ultimo_combo = None
     ultimo_drop = None
     ultimo_estado = None
